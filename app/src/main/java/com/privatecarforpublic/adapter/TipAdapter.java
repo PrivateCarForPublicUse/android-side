@@ -45,11 +45,11 @@ public class TipAdapter extends BaseAdapter {
                     R.layout.tip_item, parent, false);
         }
         final Tip tip = getItem(position);
-        TextView tip_item_name = convertView.findViewById(R.id.tip_item_name);
+        TextView tip_item_name = convertView.findViewById(R.id.name);
         tip_item_name.setText(TextUtils.isEmpty(tip.getName()) ? "" : tip.getName());
-        TextView tip_item_address=convertView.findViewById(R.id.tip_item_address);
+        TextView tip_item_address=convertView.findViewById(R.id.address);
         tip_item_address.setText(TextUtils.isEmpty(tip.getAddress()) ? "" : tip.getAddress());
-        /*TextView tip_item_distance=convertView.findViewById(R.id.tip_item_distance);
+        /*TextView tip_item_distance=convertView.findViewById(R.id.istance);
         tip_item_distance.setText(TextUtils.isEmpty(tip.getDistrict()) ? "" : tip.getPoint());*/
         return convertView;
     }
