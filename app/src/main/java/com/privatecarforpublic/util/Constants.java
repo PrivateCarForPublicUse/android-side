@@ -13,6 +13,8 @@ public class Constants {
     public static final String DEVICE_NAME= "test";
     public static final String TRACE_ID= "20";
 
+    public static final String OCR_API_KEY= "2gkm56BdWyj3tWooH9HIUwWv";
+    public static final String OCR_SECRET_KEY= "OvUlQC6BpoBsFFGoa8Bw74dhwEtyVErK";
 
     public static final String LATITUDE = "latitude";
     public static final String LONGITUDE = "longitude";
