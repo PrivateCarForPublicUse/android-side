@@ -32,6 +32,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".activity.Register1Activity" />
+        <activity android:name=".activity.IdCardActivity" />
+        <activity android:name=".activity.DriverLicenseActivity" />
+        <activity android:name=".activity.Register2Activity" />
     </application>
 
 </manifest>

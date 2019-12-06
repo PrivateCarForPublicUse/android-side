@@ -4,10 +4,8 @@ package com.privatecarforpublic.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.EditText;
 
-import com.google.gson.Gson;
 import com.privatecarforpublic.R;
 import com.privatecarforpublic.util.CommonUtil;
 import com.xiasuhuei321.loadingdialog.view.LoadingDialog;
@@ -56,7 +54,7 @@ public class LoginActivity extends Activity {
 
     @OnClick(R.id.register)
     void register() {
-        Intent intent = new Intent(LoginActivity.this, LoginActivity.class);
+        Intent intent = new Intent(LoginActivity.this, Register1Activity.class);
         startActivity(intent);
     }
 
