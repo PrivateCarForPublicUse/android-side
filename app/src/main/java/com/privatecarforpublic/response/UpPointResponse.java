@@ -24,9 +24,7 @@ public class UpPointResponse implements Serializable {
         return data;
     }
 
-    public void setData(Data data) {
-        this.data = data;
-    }
+    public void setData(Data data) { this.data = data; }
 
     public long getErrcode() {
         return errcode;

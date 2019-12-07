@@ -1,6 +1,7 @@
 package com.privatecarforpublic;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -19,6 +20,7 @@ import android.widget.ImageView;
 import com.amap.api.maps.MapView;
 import com.jaeger.library.StatusBarUtil;
 import com.privatecarforpublic.activity.IdCardActivity;
+import com.privatecarforpublic.activity.ReimbursementActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -110,6 +112,9 @@ public class MainActivity extends Activity
         if (id == R.id.my_purse) {
             // Handle the camera action
         } else if (id == R.id.reply_reimbursement) {
+            Intent intent = new Intent(MainActivity.this, ReimbursementActivity.class);
+            startActivity(intent);
+            //finish();
 
         } else if (id == R.id.my_cars) {
 

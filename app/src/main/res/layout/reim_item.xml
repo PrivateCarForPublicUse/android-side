@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="75dp">
+
+    <LinearLayout
+        android:id="@+id/reim_item_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:orientation="vertical"
+        android:paddingLeft="10dp">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/reim_item_headImage"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/head_image" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/reim_item_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@id/reim_item_1"
+        android:orientation="vertical"
+        android:paddingLeft="30dp">
+
+        <TextView
+            android:id="@+id/reim_item_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="12-05  15:18" />
+
+        <TextView
+            android:id="@+id/reim_item_start"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="始   浙江大学软件学院西门" />
+
+        <TextView
+            android:id="@+id/reim_item_end"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="终   宁波站" />
+
+        <TextView
+            android:id="@+id/reim_item_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="未报销"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:paddingTop="15dp"
+        android:paddingLeft="20dp"
+        android:layout_toRightOf="@id/reim_item_2"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_gravity="center"
+            android:id="@+id/remi_item_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="50.00"
+            android:textSize="25sp"
+            android:textStyle="italic|bold" />
+    </LinearLayout>
+</RelativeLayout>
