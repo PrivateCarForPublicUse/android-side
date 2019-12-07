@@ -5,34 +5,25 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
+            android:id="@+id/my_purse"
             android:icon="@drawable/ic_menu_camera"
-            android:title="Import" />
+            android:title="我的钱包" />
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/reply_reimbursement"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="申请报销" />
+        <item
+            android:id="@+id/my_travels"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
+            android:title="我的行程" />
         <item
-            android:id="@+id/nav_slideshow"
+            android:id="@+id/my_cars"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
+            android:title="我的车辆" />
         <item
-            android:id="@+id/nav_manage"
+            android:id="@+id/remove"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
+            android:title="注销账号" />
     </group>
-
-    <item android:title="Communicate">
-        <menu>
-            <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
-        </menu>
-    </item>
 
 </menu>

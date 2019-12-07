@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.EditText;
 
+import com.privatecarforpublic.MainActivity;
 import com.privatecarforpublic.R;
 import com.privatecarforpublic.util.CommonUtil;
 import com.xiasuhuei321.loadingdialog.view.LoadingDialog;
@@ -50,6 +51,8 @@ public class LoginActivity extends Activity {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }*/
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent);
     }
 
     @OnClick(R.id.register)

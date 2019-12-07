@@ -22,6 +22,7 @@ import com.baidu.ocr.ui.camera.CameraActivity;
 import com.baidu.ocr.ui.camera.CameraNativeHelper;
 import com.baidu.ocr.ui.camera.CameraView;
 import com.jaeger.library.StatusBarUtil;
+import com.privatecarforpublic.MainActivity;
 import com.privatecarforpublic.R;
 import com.privatecarforpublic.util.Constants;
 import com.privatecarforpublic.util.FileUtil;
@@ -71,7 +72,7 @@ public class DriverLicenseActivity extends Activity {
 
     @OnClick(R.id.side)
     void next() {
-        Intent intent = new Intent(DriverLicenseActivity.this, CameraActivity.class);
+        Intent intent = new Intent(DriverLicenseActivity.this, MainActivity.class);
         intent.putExtra("name", name);
         intent.putExtra("idNumber", idNumber);
         intent.putExtra("expiryDate", expiryDate);
