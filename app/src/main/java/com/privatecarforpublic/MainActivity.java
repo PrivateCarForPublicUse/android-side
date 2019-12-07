@@ -3,24 +3,20 @@ package com.privatecarforpublic;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.view.Gravity;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.amap.api.maps.MapView;
+import com.amap.api.services.help.Tip;
 import com.jaeger.library.StatusBarUtil;
-import com.privatecarforpublic.activity.IdCardActivity;
 import com.privatecarforpublic.activity.ReimbursementActivity;
+import com.privatecarforpublic.activity.SearchPlaceActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -28,9 +24,12 @@ import butterknife.OnClick;
 
 public class MainActivity extends Activity
         implements NavigationView.OnNavigationItemSelectedListener {
+    public static final int TO_SEARCH_DESTINATION= 100;
 
     @BindView(R.id.function)
     ImageView function;
+    @BindView(R.id.destination)
+    TextView destination;
     @BindView(R.id.nav_view)
     NavigationView navigationView;
     @BindView(R.id.drawer_layout)
@@ -44,6 +43,13 @@ public class MainActivity extends Activity
         //打开手势滑动：DrawerLayout.LOCK_MODE_UNLOCKED（Gravity.LEFT：代表左侧的）
         drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED,Gravity.LEFT);
     }
+
+    @OnClick(R.id.destination)
+    void toSelectDestination(){
+        Intent intent = new Intent(MainActivity.this, SearchPlaceActivity.class);
+        startActivityForResult(intent, TO_SEARCH_DESTINATION);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,5 +131,15 @@ public class MainActivity extends Activity
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == TO_SEARCH_DESTINATION && resultCode == Activity.RESULT_OK) {
+            Tip tip=(Tip)data.getParcelableExtra("tip");
+            destination.setText(tip.getName());
+        }
+
     }
 }

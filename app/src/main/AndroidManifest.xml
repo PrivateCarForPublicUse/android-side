@@ -20,17 +20,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.ReimbursementActivity"></activity>
-
-        <meta-data
-            android:name="com.amap.api.v2.apikey"
-            android:value="0c688aa48ef06128b410fd6c0bbb5240" />
+        <meta-data android:name="com.amap.api.v2.apikey" android:value="366d8cb5024a7236d8a9bd439d8569b1"/>
 
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".activity.LoginActivity" />
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
         <activity android:name=".activity.WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -38,10 +34,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".activity.LoginActivity" />
         <activity android:name=".activity.Register1Activity" />
         <activity android:name=".activity.IdCardActivity" />
         <activity android:name=".activity.DriverLicenseActivity" />
         <activity android:name=".activity.Register2Activity" />
+        <activity android:name=".activity.SearchPlaceActivity" />
+        <activity android:name=".activity.ReimbursementActivity"/>
     </application>
 
 </manifest>
