@@ -4,6 +4,7 @@ package com.privatecarforpublic.activity;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import com.privatecarforpublic.R;
 import com.privatecarforpublic.adapter.ReimItemAdapter;
 import com.privatecarforpublic.model.Reimburse;
+import com.privatecarforpublic.util.CommonUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +47,13 @@ public class ReimbursementActivity extends Activity {
         ReimItemAdapter adapter = new ReimItemAdapter(ReimbursementActivity.this,R.layout.reim_item, reimburseList);
         listView.setAdapter(adapter);
 
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Reimburse reimburse = reimburseList.get(position);
+                CommonUtil.showMessage(ReimbursementActivity.this, "您点击的是第" + (position+ 1) + "个");
+            }
+        });
 
     }
 
