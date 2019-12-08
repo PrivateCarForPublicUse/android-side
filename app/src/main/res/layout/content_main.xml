@@ -23,6 +23,18 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
             android:src="@drawable/function"/>
+        <TextView
+            android:id="@+id/destination"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="30dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:hint="你想去哪里？"
+            android:gravity="center_vertical"
+            android:textColor="@color/black"
+            android:textColorHint="@color/grey"
+            android:background="@drawable/text_sharp"/>
     </RelativeLayout>
 
 </android.support.constraint.ConstraintLayout>
