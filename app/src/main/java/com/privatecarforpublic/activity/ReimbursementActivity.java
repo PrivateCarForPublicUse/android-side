@@ -13,6 +13,12 @@ import com.privatecarforpublic.R;
 import com.privatecarforpublic.adapter.ReimItemAdapter;
 import com.privatecarforpublic.model.Reimburse;
 import com.privatecarforpublic.util.CommonUtil;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.constant.SpinnerStyle;
+import com.scwang.smartrefresh.layout.footer.BallPulseFooter;
+import com.scwang.smartrefresh.layout.header.BezierRadarHeader;
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +58,23 @@ public class ReimbursementActivity extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Reimburse reimburse = reimburseList.get(position);
                 CommonUtil.showMessage(ReimbursementActivity.this, "您点击的是第" + (position+ 1) + "个");
+            }
+        });
+
+       final RefreshLayout refreshLayout = (RefreshLayout)findViewById(R.id.refreshLayout);
+        //TODO   设置了样例并没有改变
+//        refreshLayout.setRefreshHeader(new BezierRadarHeader(this).setEnableHorizontalDrag(true));
+        refreshLayout.setRefreshFooter(new BallPulseFooter(this).setSpinnerStyle(SpinnerStyle.Scale));
+        refreshLayout.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(RefreshLayout refreshlayout) {
+                refreshlayout.finishRefresh(2000/*,false*/);//传入false表示刷新失败
+            }
+        });
+        refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore(RefreshLayout refreshlayout) {
+                refreshlayout.finishLoadMore(2000/*,false*/);//传入false表示加载失败
             }
         });
 
