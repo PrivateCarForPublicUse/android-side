@@ -1,4 +1,4 @@
-package com.privatecarforpublic.Application;
+package com.privatecarforpublic.application;
 
 
 import android.app.Application;

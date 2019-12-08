@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.amap.api.maps.MapView;
 import com.amap.api.services.help.Tip;
 import com.jaeger.library.StatusBarUtil;
+import com.privatecarforpublic.activity.RegimeActivity;
 import com.privatecarforpublic.activity.ReimbursementActivity;
 import com.privatecarforpublic.activity.SearchPlaceActivity;
 
@@ -46,8 +47,9 @@ public class MainActivity extends Activity
 
     @OnClick(R.id.destination)
     void toSelectDestination(){
-        Intent intent = new Intent(MainActivity.this, SearchPlaceActivity.class);
-        startActivityForResult(intent, TO_SEARCH_DESTINATION);
+        Intent intent = new Intent(MainActivity.this, RegimeActivity.class);
+        startActivity(intent);
+        //startActivityForResult(intent, TO_SEARCH_DESTINATION);
     }
 
     @Override
@@ -136,10 +138,10 @@ public class MainActivity extends Activity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == TO_SEARCH_DESTINATION && resultCode == Activity.RESULT_OK) {
+        /*if (requestCode == TO_SEARCH_DESTINATION && resultCode == Activity.RESULT_OK) {
             Tip tip=(Tip)data.getParcelableExtra("tip");
             destination.setText(tip.getName());
-        }
+        }*/
 
     }
 }

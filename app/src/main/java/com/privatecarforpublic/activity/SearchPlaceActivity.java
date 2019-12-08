@@ -32,6 +32,7 @@ public class SearchPlaceActivity extends Activity implements SearchView.OnQueryT
 
     private List<Tip> myTipList;
     private TipAdapter tipAdapter;
+    private int position;
 
     @BindView(R.id.search_address)
     SearchView searchAddress;
@@ -50,6 +51,7 @@ public class SearchPlaceActivity extends Activity implements SearchView.OnQueryT
         ButterKnife.bind(this);
         title.setText("搜索地点");
         side.setVisibility(View.INVISIBLE);
+        position=getIntent().getIntExtra("position",0);
         //状态栏颜色设置
         StatusBarUtil.setColor(SearchPlaceActivity.this, 25);
         //初始化SearchView
@@ -76,6 +78,7 @@ public class SearchPlaceActivity extends Activity implements SearchView.OnQueryT
             Tip tip = (Tip) adapterView.getItemAtPosition(i);
             Intent intent = new Intent();
             intent.putExtra("tip", tip);
+            intent.putExtra("position",position);
             setResult(Activity.RESULT_OK, intent);
             this.finish();
         }
