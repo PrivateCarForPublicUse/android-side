@@ -24,6 +24,7 @@ import com.baidu.ocr.ui.camera.CameraView;
 import com.jaeger.library.StatusBarUtil;
 import com.privatecarforpublic.MainActivity;
 import com.privatecarforpublic.R;
+import com.privatecarforpublic.application.MyApplication;
 import com.privatecarforpublic.util.Constants;
 import com.privatecarforpublic.util.FileUtil;
 
@@ -63,6 +64,7 @@ public class DriverLicenseActivity extends Activity {
         initAccessTokenWithAkSk();
         //状态栏颜色设置
         StatusBarUtil.setColor(DriverLicenseActivity.this, 25);
+        MyApplication.addDestroyActivity(this,TAG);
     }
 
     @OnClick(R.id.back)
@@ -77,6 +79,7 @@ public class DriverLicenseActivity extends Activity {
         intent.putExtra("idNumber", idNumber);
         intent.putExtra("expiryDate", expiryDate);
         startActivity(intent);
+        MyApplication.destroyAll();
     }
 
     //驾驶证（手动）

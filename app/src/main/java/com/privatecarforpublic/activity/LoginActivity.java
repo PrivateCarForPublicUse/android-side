@@ -8,6 +8,7 @@ import android.widget.EditText;
 
 import com.privatecarforpublic.MainActivity;
 import com.privatecarforpublic.R;
+import com.privatecarforpublic.application.MyApplication;
 import com.privatecarforpublic.util.CommonUtil;
 import com.xiasuhuei321.loadingdialog.view.LoadingDialog;
 
@@ -29,6 +30,7 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_user);
         init();
+        MyApplication.addDestroyActivity(this,TAG);
     }
 
     @OnClick(R.id.login)
@@ -53,6 +55,7 @@ public class LoginActivity extends Activity {
         }*/
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(intent);
+        this.finish();
     }
 
     @OnClick(R.id.register)

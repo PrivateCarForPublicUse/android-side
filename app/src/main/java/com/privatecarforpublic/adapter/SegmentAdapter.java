@@ -77,7 +77,7 @@ public class SegmentAdapter extends BaseAdapter{
         return convertView;
     }
 
-    class ViewHolder {
+    private class ViewHolder {
         private TextView departure;
         private TextView destination;
     }

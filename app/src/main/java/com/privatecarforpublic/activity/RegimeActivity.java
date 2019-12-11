@@ -7,6 +7,7 @@ import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -76,6 +77,12 @@ public class RegimeActivity extends Activity {
     void addSegment() {
         segmentList.add(newSegment());
         segmentAdapter.notifyDataSetChanged();
+    }
+
+    @OnClick(R.id.regime)
+    void toSelectCar() {
+        Intent intent=new Intent(RegimeActivity.this,SelectCarActivity.class);
+        startActivity(intent);
     }
 
     private Segment newSegment(){

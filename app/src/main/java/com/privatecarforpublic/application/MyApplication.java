@@ -1,6 +1,7 @@
 package com.privatecarforpublic.application;
 
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -16,8 +17,14 @@ import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.xiasuhuei321.loadingdialog.manager.StyleManager;
 import com.xiasuhuei321.loadingdialog.view.LoadingDialog;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 public class MyApplication extends Application {
-    static {//使用static代码段可以防止内存泄漏
+    private static Map<String, Activity> destoryMap = new HashMap<>();
+
+    /*static {//使用static代码段可以防止内存泄漏
 
         //设置全局默认配置（优先级最低，会被其他设置覆盖）
         SmartRefreshLayout.setDefaultRefreshInitializer(new DefaultRefreshInitializer() {
@@ -41,19 +48,50 @@ public class MyApplication extends Application {
                 return new MaterialHeader(context).setColorSchemeResources(R.color.red, R.color.green, R.color.blue);
             }
         });
-    }
+    }*/
     @Override
     public void onCreate() {
         super.onCreate();
         setLoadingDialog();
     }
 
-    private void setLoadingDialog(){
+    private void setLoadingDialog() {
         StyleManager s = new StyleManager();
         //在这里调用方法设置s的属性
         // code here...
         s.Anim(false).repeatTime(0).contentSize(-1).intercept(true);
         LoadingDialog.initStyle(s);
+    }
+
+    /**
+     * 添加到销毁队列
+     *
+     * @param activity 要销毁的activity
+     */
+
+    public static void addDestroyActivity(Activity activity, String activityName) {
+        destoryMap.put(activityName, activity);
+    }
+
+    /**
+     * 销毁指定Activity
+     */
+    public static void destroyActivity(String activityName) {
+        Set<String> keySet = destoryMap.keySet();
+        for (String key : keySet) {
+            if (key.equals(activityName))
+                destoryMap.get(key).finish();
+        }
+    }
+
+    /**
+     * 销毁指定Activity
+     */
+    public static void destroyAll() {
+        Set<String> keySet = destoryMap.keySet();
+        for (String key : keySet) {
+            destoryMap.get(key).finish();
+        }
     }
 
 }

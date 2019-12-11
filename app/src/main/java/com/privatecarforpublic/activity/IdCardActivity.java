@@ -23,6 +23,7 @@ import com.baidu.ocr.ui.camera.CameraNativeHelper;
 import com.baidu.ocr.ui.camera.CameraView;
 import com.jaeger.library.StatusBarUtil;
 import com.privatecarforpublic.R;
+import com.privatecarforpublic.application.MyApplication;
 import com.privatecarforpublic.util.Constants;
 import com.privatecarforpublic.util.FileUtil;
 
@@ -64,6 +65,7 @@ public class IdCardActivity extends Activity {
         initAccessTokenWithAkSk();
         //状态栏颜色设置
         StatusBarUtil.setColor(IdCardActivity.this, 25);
+        MyApplication.addDestroyActivity(this,TAG);
     }
 
     @OnClick(R.id.back)
