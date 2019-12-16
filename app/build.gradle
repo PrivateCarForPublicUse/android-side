@@ -40,7 +40,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.amap.api:navi-3dmap:latest.integration'
     implementation 'com.amap.api:search:latest.integration'
-    implementation 'com.amap.api:location:latest.integration'
     implementation 'com.squareup.okhttp3:okhttp:4.2.2'
     implementation 'com.alibaba:fastjson:1.1.71.android'
     implementation 'de.hdodenhof:circleimageview:3.0.1'
@@ -53,6 +52,7 @@ dependencies {
     implementation 'com.jakewharton:butterknife:9.0.0-rc2'
     annotationProcessor 'com.jakewharton:butterknife-compiler:9.0.0-rc2'
     implementation files('libs/ocr-sdk.jar')
+    implementation files('libs/AMapTrack_AMapLocation.jar')
     implementation project(':ocr_ui')
 
     compileOnly 'org.projectlombok:lombok:1.18.6'
