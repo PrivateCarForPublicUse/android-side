@@ -47,9 +47,11 @@ import com.amap.api.track.query.model.QueryTerminalRequest;
 import com.amap.api.track.query.model.QueryTerminalResponse;
 import com.amap.api.track.query.model.QueryTrackResponse;
 import com.jaeger.library.StatusBarUtil;
+import com.privatecarforpublic.activity.MyTravelsActivity;
 import com.privatecarforpublic.activity.RegimeActivity;
 import com.privatecarforpublic.activity.ReimbursementActivity;
 import com.privatecarforpublic.activity.SearchPlaceActivity;
+import com.privatecarforpublic.model.MyTravels;
 import com.privatecarforpublic.util.Constants;
 
 import java.util.ArrayList;
@@ -161,7 +163,8 @@ public class MainActivity extends Activity
         } else if (id == R.id.my_cars) {
 
         } else if (id == R.id.my_travels) {
-
+            Intent intent = new Intent(MainActivity.this, MyTravelsActivity.class);
+            startActivity(intent);
         } else if (id == R.id.remove) {
 
         }

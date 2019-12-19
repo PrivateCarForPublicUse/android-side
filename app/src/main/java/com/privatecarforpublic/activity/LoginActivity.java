@@ -37,25 +37,9 @@ public class LoginActivity extends Activity {
     void login() {
         ld.show();
         CommonUtil.processLoading(ld,1);
-        /*Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        thread.start();
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(intent);
-        this.finish();
+        //this.finish();
     }
 
     @OnClick(R.id.register)
