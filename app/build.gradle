@@ -53,11 +53,11 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:9.0.0-rc2'
     implementation files('libs/ocr-sdk.jar')
     implementation files('libs/AMapTrack_AMapLocation.jar')
-    implementation project(':ocr_ui')
 
     compileOnly 'org.projectlombok:lombok:1.18.6'
     annotationProcessor 'org.projectlombok:lombok:1.18.6'
     implementation 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.0'  //1.0.5及以前版本的老用户升级需谨慎，API改动过大
-    implementation 'com.scwang.smartrefresh:SmartRefreshHeader:1.1.0'  //没有使用特殊Header，可以不加这行
+    implementation 'com.scwang.smartrefresh:SmartRefreshHeader:1.1.0'
+    implementation project(path: ':ocr_ui')  //没有使用特殊Header，可以不加这行
 
 }
