@@ -37,21 +37,25 @@ public class LoginActivity extends Activity {
     void login() {
         ld.show();
         CommonUtil.processLoading(ld,1);
-        new Thread(new Runnable() {
+        /*Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    LoginActivity.this.finish();
-                } catch (Exception e) {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
                     e.printStackTrace();
-                    CommonUtil.showMessage(LoginActivity.this,"登录出错");
                 }
             }
-        }).start();
-
+        });
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent);
+        this.finish();
     }
 
     @OnClick(R.id.register)
