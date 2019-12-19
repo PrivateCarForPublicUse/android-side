@@ -32,11 +32,25 @@ import com.amap.api.services.help.Tip;
 import com.amap.api.track.AMapTrackClient;
 import com.amap.api.track.ErrorCode;
 import com.amap.api.track.OnTrackLifecycleListener;
+import com.amap.api.track.TrackParam;
 import com.amap.api.track.query.entity.LocationMode;
+import com.amap.api.track.query.model.AddTerminalRequest;
+import com.amap.api.track.query.model.AddTerminalResponse;
+import com.amap.api.track.query.model.AddTrackRequest;
+import com.amap.api.track.query.model.AddTrackResponse;
+import com.amap.api.track.query.model.DistanceResponse;
+import com.amap.api.track.query.model.HistoryTrackResponse;
+import com.amap.api.track.query.model.LatestPointResponse;
+import com.amap.api.track.query.model.OnTrackListener;
+import com.amap.api.track.query.model.ParamErrorResponse;
+import com.amap.api.track.query.model.QueryTerminalRequest;
+import com.amap.api.track.query.model.QueryTerminalResponse;
+import com.amap.api.track.query.model.QueryTrackResponse;
 import com.jaeger.library.StatusBarUtil;
 import com.privatecarforpublic.activity.RegimeActivity;
 import com.privatecarforpublic.activity.ReimbursementActivity;
 import com.privatecarforpublic.activity.SearchPlaceActivity;
+import com.privatecarforpublic.util.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +61,9 @@ import butterknife.OnClick;
 
 public class MainActivity extends Activity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private String terminalName="account";
+    private Long terminalId=(long)-1;
     private AMapLocationClient mLocationClient = null;
     //声明AMapLocationClientOption对象
     public AMapLocationClientOption mLocationOption = null;
@@ -162,12 +179,13 @@ public class MainActivity extends Activity
 
     }
 
-    //初始化猎鹰服务
+    //初始化并开启猎鹰服务
     private void initTrack(){
         aMapTrackClient = new AMapTrackClient(getApplicationContext());
         aMapTrackClient.setCacheSize(20);
         aMapTrackClient.setLocationMode(LocationMode.HIGHT_ACCURACY);
-
+        //这一步将直接创建TRACK并开启跟踪上报
+        aMapTrackClient.queryTerminal(new QueryTerminalRequest(Long.parseLong(Constants.SERVICE_ID), terminalName), onTrackListener);
     }
 
     //实现实时定位
@@ -294,16 +312,19 @@ public class MainActivity extends Activity
 
     final OnTrackLifecycleListener onTrackLifecycleListener = new OnTrackLifecycleListener() {
         @Override
-        public void onBindServiceCallback(int var1, String var2){
+        public void onBindServiceCallback(int var1, String var2) {
         }
+
         @Override
-        public void onStopGatherCallback(int var1, String var2){
+        public void onStopGatherCallback(int var1, String var2) {
 
         }
+
         @Override
-        public void onStopTrackCallback(int var1, String var2){
+        public void onStopTrackCallback(int var1, String var2) {
 
         }
+
         @Override
         public void onStartGatherCallback(int status, String msg) {
             if (status == ErrorCode.TrackListen.START_GATHER_SUCEE ||
@@ -324,6 +345,73 @@ public class MainActivity extends Activity
             } else {
                 Toast.makeText(MainActivity.this, "轨迹上报服务服务启动异常，" + msg, Toast.LENGTH_SHORT).show();
             }
+        }
+    };
+    final OnTrackListener onTrackListener=new OnTrackListener() {
+        @Override
+        public void onQueryTerminalCallback(QueryTerminalResponse queryTerminalResponse) {
+            if (queryTerminalResponse.isSuccess()) {
+                if (queryTerminalResponse.getTid() <= 0)
+                    // terminal还不存在，先创建
+                    aMapTrackClient.addTerminal(new AddTerminalRequest(terminalName, Long.parseLong(Constants.SERVICE_ID)), this);
+                else {
+                    // terminal已经存在，直接开启猎鹰服务
+                    terminalId = queryTerminalResponse.getTid();
+                    aMapTrackClient.addTrack(new AddTrackRequest(Long.parseLong(Constants.SERVICE_ID), terminalId),this);
+                }
+            }else {
+                // 请求失败
+                Toast.makeText(MainActivity.this, "请求失败，" + queryTerminalResponse.getErrorMsg(), Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        public void onCreateTerminalCallback(AddTerminalResponse addTerminalResponse) {
+            if (addTerminalResponse.isSuccess()) {
+                // 创建完成，开启猎鹰服务
+                terminalId = addTerminalResponse.getTid();
+                aMapTrackClient.addTrack(new AddTrackRequest(Long.parseLong(Constants.SERVICE_ID), terminalId),this);
+            } else {
+                // 请求失败
+                Toast.makeText(MainActivity.this, "请求失败，" + addTerminalResponse.getErrorMsg(), Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        public void onDistanceCallback(DistanceResponse distanceResponse) {
+
+        }
+
+        @Override
+        public void onLatestPointCallback(LatestPointResponse latestPointResponse) {
+
+        }
+
+        @Override
+        public void onHistoryTrackCallback(HistoryTrackResponse historyTrackResponse) {
+
+        }
+
+        @Override
+        public void onQueryTrackCallback(QueryTrackResponse queryTrackResponse) {
+
+        }
+
+        @Override
+        public void onAddTrackCallback(AddTrackResponse addTrackResponse) {
+            if (addTrackResponse.isSuccess()) {
+                Long trackId = addTrackResponse.getTrid();
+                TrackParam trackParam = new TrackParam(Long.parseLong(Constants.SERVICE_ID), terminalId);
+                trackParam.setTrackId(trackId);
+                aMapTrackClient.startTrack(trackParam, onTrackLifecycleListener);
+            } else {
+                Toast.makeText(MainActivity.this, "网络请求失败，" + addTrackResponse.getErrorMsg(), Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        public void onParamErrorCallback(ParamErrorResponse paramErrorResponse) {
+
         }
     };
 }
