@@ -31,13 +31,6 @@
             android:textSize="13sp"
             android:layout_marginTop="10dp"
             android:text="奥迪A6"/>
-        <TextView
-            android:id="@+id/type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="13sp"
-            android:layout_marginTop="10dp"
-            android:text="奥迪A6"/>
     </LinearLayout>
     <RelativeLayout
         android:layout_width="wrap_content"

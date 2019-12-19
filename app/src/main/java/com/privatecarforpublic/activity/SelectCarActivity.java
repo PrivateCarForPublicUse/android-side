@@ -49,15 +49,15 @@ public class SelectCarActivity extends Activity {
         StatusBarUtil.setColor(SelectCarActivity.this, 25);
     }
 
-    private void init(){
-        privateCarList=new ArrayList<>();
+    private void init() {
+        privateCarList = new ArrayList<>();
         privateCarList.add(new Car());
-        publicCarList=new ArrayList<>();
+        publicCarList = new ArrayList<>();
         publicCarList.add(new Car());
         publicCarList.add(new Car());
         publicCarList.add(new Car());
-        privateCarAdapter=new CarAdapter(this,privateCarList);
-        publicCarAdapter=new CarAdapter(this,publicCarList);
+        privateCarAdapter = new CarAdapter(this, privateCarList, 1);
+        publicCarAdapter = new CarAdapter(this, publicCarList, 1);
         private_car_list.setAdapter(privateCarAdapter);
         public_car_list.setAdapter(publicCarAdapter);
     }

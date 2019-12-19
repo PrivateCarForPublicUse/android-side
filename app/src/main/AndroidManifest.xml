@@ -11,8 +11,9 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
-    <uses-permission android:name="android.permission.BLUETOOTH"/>
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
     <application
         android:name=".application.MyApplication"
         android:allowBackup="true"
@@ -21,13 +22,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <meta-data android:name="com.amap.api.v2.apikey" android:value="366d8cb5024a7236d8a9bd439d8569b1"/>
+        <meta-data
+            android:name="com.amap.api.v2.apikey"
+            android:value="366d8cb5024a7236d8a9bd439d8569b1" />
 
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity android:name=".activity.WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -41,11 +43,11 @@
         <activity android:name=".activity.DriverLicenseActivity" />
         <activity android:name=".activity.Register2Activity" />
         <activity android:name=".activity.SearchPlaceActivity" />
-        <activity android:name=".activity.ReimbursementActivity"/>
+        <activity android:name=".activity.ReimbursementActivity" />
         <activity android:name=".activity.RegimeActivity" />
         <activity android:name=".activity.SelectCarActivity" />
         <activity android:name=".activity.MyTravelsActivity" />
-
+        <activity android:name=".activity.MyCarsActivity" />
         <service android:name="com.amap.api.track.AMapTrackService" />
         <service android:name="com.amap.api.location.APSService" />
     </application>

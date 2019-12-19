@@ -3,10 +3,12 @@ package com.privatecarforpublic.model;
 import java.io.Serializable;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
+@Builder
 public class Car implements Serializable {
     private Long id;
     //车辆id
@@ -16,10 +18,12 @@ public class Car implements Serializable {
     //车辆照片url
     private String drivingLicenseUrl;
     //车辆行驶证url
-    private String band;
+    private String brand;
     //车辆品牌
     private String type;
     //车辆型号
+    private double journey;
+    //以行驶的路程
     private double starOfCar;
     //车辆星级
     private String insuranceCompany;
