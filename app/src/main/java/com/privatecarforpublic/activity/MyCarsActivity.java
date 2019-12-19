@@ -2,6 +2,7 @@ package com.privatecarforpublic.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -9,6 +10,10 @@ import com.privatecarforpublic.R;
 import com.privatecarforpublic.adapter.CarAdapter;
 import com.privatecarforpublic.model.Car;
 import com.privatecarforpublic.util.CommonUtil;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.constant.SpinnerStyle;
+import com.scwang.smartrefresh.layout.footer.BallPulseFooter;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,11 +29,14 @@ public class MyCarsActivity extends Activity {
     TextView title;
     @BindView(R.id.side)
     TextView side;
-
     @BindView(R.id.my_cars_private_car)
     ListView listView;
     @BindView(R.id.my_cars_public_car)
     ListView listView1;
+    @BindView(R.id.refreshLayout)
+    RefreshLayout refreshLayout;
+    @BindView(R.id.refreshLayout1)
+    RefreshLayout refreshLayout1;
 
     @OnClick(R.id.back)
     void back() {
@@ -65,6 +73,28 @@ public class MyCarsActivity extends Activity {
             Car car = carList1.get(position);
             CommonUtil.showMessage(MyCarsActivity.this, "您点击的是第" + (position + 1) + "个");
         }));
+
+        refreshLayout.setRefreshFooter(new BallPulseFooter(this).setSpinnerStyle(SpinnerStyle.Scale));
+        refreshLayout.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(RefreshLayout refreshlayout) {
+                refreshlayout.finishRefresh(2000/*,false*/);//传入false表示刷新失败
+            }
+        });
+        refreshLayout.setOnLoadMoreListener(refreshLayout1 -> {
+            refreshLayout1.finishLoadMore(2000);//传入false表示加载失败
+        });
+
+        refreshLayout1.setRefreshFooter(new BallPulseFooter(this).setSpinnerStyle(SpinnerStyle.Scale));
+        refreshLayout1.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(RefreshLayout refreshlayout) {
+                refreshlayout.finishRefresh(2000/*,false*/);//传入false表示刷新失败
+            }
+        });
+        refreshLayout1.setOnLoadMoreListener(refreshLayout1 -> {
+            refreshLayout1.finishLoadMore(2000);//传入false表示加载失败
+        });
     }
 
     private void init() {

@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#F2F2F2"
     android:orientation="vertical">
 
@@ -22,11 +23,24 @@
     <LinearLayout
         style="@style/common_horizontal_division_line_style"
         android:layout_marginTop="5dp" />
+    <com.scwang.smartrefresh.layout.SmartRefreshLayout
+        android:id="@+id/refreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:srlEnablePreviewInEditMode="true"
+        app:srlPrimaryColor="#444444">
 
-    <ListView
-        android:id="@+id/my_cars_private_car"
+    <com.scwang.smartrefresh.layout.header.ClassicsHeader
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+        <ListView
+            android:id="@+id/my_cars_private_car"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <com.scwang.smartrefresh.layout.footer.ClassicsFooter
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 
     <TextView
         android:layout_width="match_parent"
@@ -35,10 +49,22 @@
         android:text="共有车辆"
         android:textSize="30dp"
         android:textStyle="bold" />
+    <com.scwang.smartrefresh.layout.SmartRefreshLayout
+        android:id="@+id/refreshLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:srlEnablePreviewInEditMode="true"
+        app:srlPrimaryColor="#444444">
 
-    <ListView
-        android:id="@+id/my_cars_public_car"
+        <com.scwang.smartrefresh.layout.header.ClassicsHeader
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <ListView
+            android:id="@+id/my_cars_public_car"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    <com.scwang.smartrefresh.layout.footer.ClassicsFooter
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-
+</com.scwang.smartrefresh.layout.SmartRefreshLayout>
 </LinearLayout>
