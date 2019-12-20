@@ -48,6 +48,7 @@
         <activity android:name=".activity.MyTravelsActivity" />
         <activity android:name=".activity.MyCarsActivity" />
         <activity android:name=".activity.SelectCarDetailActivity" />
+        <activity android:name=".activity.RemainingSegmentActivity" />
 
         <service android:name="com.amap.api.track.AMapTrackService" />
         <service android:name="com.amap.api.location.APSService" />

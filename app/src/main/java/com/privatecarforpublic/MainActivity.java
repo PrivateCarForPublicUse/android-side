@@ -53,6 +53,7 @@ import com.privatecarforpublic.activity.MyCarsActivity;
 import com.privatecarforpublic.activity.MyTravelsActivity;
 import com.privatecarforpublic.activity.RegimeActivity;
 import com.privatecarforpublic.activity.ReimbursementActivity;
+import com.privatecarforpublic.activity.RemainingSegmentActivity;
 import com.privatecarforpublic.activity.SearchPlaceActivity;
 import com.privatecarforpublic.model.MyTravels;
 import com.privatecarforpublic.application.MyApplication;
@@ -69,6 +70,7 @@ import butterknife.OnClick;
 public class MainActivity extends Activity
         implements NavigationView.OnNavigationItemSelectedListener {
     public final static int TO_REGIME=201;
+    public final static int TO_CHOOSE_SEGMENT=202;
 
     private String terminalName="test";
     private Long terminalId=(long)-1;
@@ -199,10 +201,13 @@ public class MainActivity extends Activity
 
         if (id == R.id.my_purse) {
             // Handle the camera action
+        } else if (id == R.id.remaining_segment) {
+            Intent intent = new Intent(MainActivity.this, RemainingSegmentActivity.class);
+            startActivityForResult(intent,TO_CHOOSE_SEGMENT);
+
         } else if (id == R.id.reply_reimbursement) {
             Intent intent = new Intent(MainActivity.this, ReimbursementActivity.class);
             startActivity(intent);
-            //finish();
 
         } else if (id == R.id.my_cars) {
             Intent intent = new Intent(MainActivity.this, MyCarsActivity.class);
@@ -225,6 +230,8 @@ public class MainActivity extends Activity
             start.setVisibility(View.VISIBLE);
             cancel.setVisibility(View.VISIBLE);
             destination.setVisibility(View.INVISIBLE);
+        }else if (requestCode == TO_CHOOSE_SEGMENT && resultCode == Activity.RESULT_OK) {
+             CommonUtil.showMessage(this,"开始段行程");
         }
 
     }
