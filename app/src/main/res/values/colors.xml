@@ -16,4 +16,6 @@
     <color name="green">#33CC00</color>
     <color name="greenPrimary">#00EE00</color>
     <color name="greenSecondary">#32CD32</color>
+    <color name="redPrimary">#FF4500</color>
+    <color name="redSecondary">#FF0000</color>
 </resources>

@@ -38,12 +38,12 @@ public class Register1Activity extends Activity {
         side.setVisibility(View.INVISIBLE);
         //状态栏颜色设置
         StatusBarUtil.setColor(Register1Activity.this, 25);
-        MyApplication.addDestroyActivity(this,TAG);
     }
 
     @OnClick(R.id.next)
     void next() {
         if (password.getText().toString().equals(rePassword.getText().toString())) {
+            MyApplication.addDestroyActivity(this,TAG);
             Intent intent = new Intent(Register1Activity.this, Register2Activity.class);
             intent.putExtra("account",account.getText().toString());
             intent.putExtra("password",password.getText().toString());

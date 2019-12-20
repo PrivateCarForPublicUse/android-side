@@ -20,27 +20,27 @@ public class JsonUtil {
      */
     private static final String TAG = "PrivateCarForPublic_NET";
 
-    public static ResponseResult sendRequest(HttpRequestMethod requestMethod, String cookie, String url, Object entity) {
+    public static ResponseResult sendRequest(HttpRequestMethod requestMethod, String token, String url, Object entity) {
         Request request = null;
         RequestBody body;
         String json = gson.toJson(entity);
         switch (requestMethod) {
             case HttpGet:
-                request = new Request.Builder().url(url).addHeader("Authorization",cookie).get().build();
+                request = new Request.Builder().url(url).addHeader("token",token).get().build();
                 break;
             case HttpPost:
                 body = RequestBody.create(JSON, json);
-                if(cookie==null)
+                if(token==null)
                     request = new Request.Builder().url(url).post(body).build();
                 else
-                    request = new Request.Builder().url(url).addHeader("Authorization",cookie).post(body).build();
+                    request = new Request.Builder().url(url).addHeader("token",token).post(body).build();
                 break;
             case HttpPut:
                 body = RequestBody.create(JSON, json);
-                request = new Request.Builder().url(url).addHeader("Authorization",cookie).put(body).build();
+                request = new Request.Builder().url(url).addHeader("token",token).put(body).build();
                 break;
             case HttpDelete:
-                request = new Request.Builder().url(url).addHeader("Authorization",cookie).delete().build();
+                request = new Request.Builder().url(url).addHeader("token",token).delete().build();
                 break;
         }
         try {

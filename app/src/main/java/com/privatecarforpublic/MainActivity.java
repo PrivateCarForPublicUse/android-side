@@ -11,6 +11,8 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -53,6 +55,8 @@ import com.privatecarforpublic.activity.RegimeActivity;
 import com.privatecarforpublic.activity.ReimbursementActivity;
 import com.privatecarforpublic.activity.SearchPlaceActivity;
 import com.privatecarforpublic.model.MyTravels;
+import com.privatecarforpublic.application.MyApplication;
+import com.privatecarforpublic.util.CommonUtil;
 import com.privatecarforpublic.util.Constants;
 
 import java.util.ArrayList;
@@ -64,9 +68,11 @@ import butterknife.OnClick;
 
 public class MainActivity extends Activity
         implements NavigationView.OnNavigationItemSelectedListener {
+    public final static int TO_REGIME=201;
 
-    private String terminalName="account";
+    private String terminalName="test";
     private Long terminalId=(long)-1;
+    private Long trackId=(long)-1;
     private AMapLocationClient mLocationClient = null;
     //声明AMapLocationClientOption对象
     public AMapLocationClientOption mLocationOption = null;
@@ -80,6 +86,12 @@ public class MainActivity extends Activity
     ImageView function;
     @BindView(R.id.destination)
     TextView destination;
+    @BindView(R.id.start)
+    Button start;
+    @BindView(R.id.cancel)
+    TextView cancel;
+    @BindView(R.id.finish)
+    Button finish;
     @BindView(R.id.nav_view)
     NavigationView navigationView;
     @BindView(R.id.drawer_layout)
@@ -97,15 +109,39 @@ public class MainActivity extends Activity
     @OnClick(R.id.destination)
     void toSelectDestination(){
         Intent intent = new Intent(MainActivity.this, RegimeActivity.class);
-        startActivity(intent);
-        //startActivityForResult(intent, TO_SEARCH_DESTINATION);
+        startActivityForResult(intent, TO_REGIME);
+    }
+
+    @OnClick(R.id.start)
+    void startJourney(){
+        start.setVisibility(View.INVISIBLE);
+        cancel.setVisibility(View.INVISIBLE);
+        finish.setVisibility(View.VISIBLE);
+        initTrack();
+        locate();
+    }
+
+    @OnClick(R.id.cancel)
+    void cancelJourney(){
+        start.setVisibility(View.INVISIBLE);
+        cancel.setVisibility(View.INVISIBLE);
+        destination.setVisibility(View.VISIBLE);
+        CommonUtil.showMessage(this,"行程已取消");
+    }
+
+    @OnClick(R.id.finish)
+    void finishJourney(){
+        finish.setText("行程已结束");
+        TrackParam trackParam = new TrackParam(Long.parseLong(Constants.SERVICE_ID), terminalId);
+        trackParam.setTrackId(trackId);
+        aMapTrackClient.stopTrack(trackParam, onTrackLifecycleListener);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
+        init();
         //状态栏颜色设置
         StatusBarUtil.setColor(MainActivity.this, 25);
 
@@ -115,6 +151,13 @@ public class MainActivity extends Activity
         /*//实现实时定位
         locate();*/
         navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    private void init(){
+        ButterKnife.bind(this);
+        start.setVisibility(View.INVISIBLE);
+        cancel.setVisibility(View.INVISIBLE);
+        finish.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -178,10 +221,11 @@ public class MainActivity extends Activity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        /*if (requestCode == TO_SEARCH_DESTINATION && resultCode == Activity.RESULT_OK) {
-            Tip tip=(Tip)data.getParcelableExtra("tip");
-            destination.setText(tip.getName());
-        }*/
+        if (requestCode == TO_REGIME && resultCode == Activity.RESULT_OK) {
+            start.setVisibility(View.VISIBLE);
+            cancel.setVisibility(View.VISIBLE);
+            destination.setVisibility(View.INVISIBLE);
+        }
 
     }
 
@@ -328,7 +372,7 @@ public class MainActivity extends Activity
 
         @Override
         public void onStopTrackCallback(int var1, String var2) {
-
+            Toast.makeText(MainActivity.this, "定位跟踪关闭成功！", Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -406,7 +450,8 @@ public class MainActivity extends Activity
         @Override
         public void onAddTrackCallback(AddTrackResponse addTrackResponse) {
             if (addTrackResponse.isSuccess()) {
-                Long trackId = addTrackResponse.getTrid();
+                trackId = addTrackResponse.getTrid();
+                Log.e("trackId",trackId+"");
                 TrackParam trackParam = new TrackParam(Long.parseLong(Constants.SERVICE_ID), terminalId);
                 trackParam.setTrackId(trackId);
                 aMapTrackClient.startTrack(trackParam, onTrackLifecycleListener);

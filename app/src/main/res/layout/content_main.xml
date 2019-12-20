@@ -35,6 +35,44 @@
             android:textColor="@color/black"
             android:textColorHint="@color/grey"
             android:background="@drawable/text_sharp"/>
+        <Button
+            android:id="@+id/start"
+            android:layout_width="160dp"
+            android:layout_height="40dp"
+            android:layout_marginBottom="15dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="30dp"
+            android:text="开始行程"
+            android:textColor="#fff"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:background="@drawable/start_selector"/>
+        <Button
+            android:id="@+id/cancel"
+            android:layout_width="160dp"
+            android:layout_height="40dp"
+            android:layout_marginBottom="15dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="30dp"
+            android:text="取消行程"
+            android:textColor="#fff"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:background="@drawable/cancel_selector"/>
+        <Button
+            android:id="@+id/finish"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="30dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:text="结束行程"
+            android:textColor="#fff"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:background="@drawable/cancel_selector"/>
     </RelativeLayout>
 
 </android.support.constraint.ConstraintLayout>

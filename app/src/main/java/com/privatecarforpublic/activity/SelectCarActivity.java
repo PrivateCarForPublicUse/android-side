@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.jaeger.library.StatusBarUtil;
 import com.privatecarforpublic.R;
 import com.privatecarforpublic.adapter.CarAdapter;
+import com.privatecarforpublic.application.MyApplication;
 import com.privatecarforpublic.model.Car;
 
 import java.util.ArrayList;
@@ -22,6 +23,8 @@ import butterknife.OnClick;
 import butterknife.OnItemClick;
 
 public class SelectCarActivity extends Activity {
+    private static final String TAG = "SelectCarActivity";
+    public final static int TO_SELECT_CAR = 104;
 
     @BindView(R.id.private_car_list)
     ListView private_car_list;
@@ -64,16 +67,30 @@ public class SelectCarActivity extends Activity {
 
     @OnItemClick(R.id.private_car_list)
     public void onPrivateItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
+        Intent intent=new Intent(SelectCarActivity.this,SelectCarDetailActivity.class);
+        intent.putExtra("car",privateCarList.get(i));
+        startActivityForResult(intent,TO_SELECT_CAR);
     }
 
     @OnItemClick(R.id.public_car_list)
     public void onPublicItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
+        Intent intent=new Intent(SelectCarActivity.this,SelectCarDetailActivity.class);
+        intent.putExtra("car",publicCarList.get(i));
+        startActivityForResult(intent,TO_SELECT_CAR);
     }
 
     @OnClick(R.id.back)
     void back() {
         finish();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == TO_SELECT_CAR && resultCode == Activity.RESULT_OK) {
+            Intent intent = new Intent();
+            setResult(Activity.RESULT_OK, intent);
+            finish();   //finish应该写到这个地方
+        }
     }
 }

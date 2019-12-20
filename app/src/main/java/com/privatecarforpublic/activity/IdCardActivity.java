@@ -65,7 +65,6 @@ public class IdCardActivity extends Activity {
         initAccessTokenWithAkSk();
         //状态栏颜色设置
         StatusBarUtil.setColor(IdCardActivity.this, 25);
-        MyApplication.addDestroyActivity(this,TAG);
     }
 
     @OnClick(R.id.back)
@@ -75,6 +74,7 @@ public class IdCardActivity extends Activity {
 
     @OnClick(R.id.side)
     void next() {
+        MyApplication.addDestroyActivity(this,TAG);
         Intent intent = new Intent(IdCardActivity.this, DriverLicenseActivity.class);
         intent.putExtra("name", name);
         intent.putExtra("idNumber", idNumber);

@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class MyApplication extends Application {
-    private static Map<String, Activity> destoryMap = new HashMap<>();
+    private static Map<String, Activity> destroyMap = new HashMap<>();
 
     /*static {//使用static代码段可以防止内存泄漏
 
@@ -70,17 +70,17 @@ public class MyApplication extends Application {
      */
 
     public static void addDestroyActivity(Activity activity, String activityName) {
-        destoryMap.put(activityName, activity);
+        destroyMap.put(activityName, activity);
     }
 
     /**
      * 销毁指定Activity
      */
     public static void destroyActivity(String activityName) {
-        Set<String> keySet = destoryMap.keySet();
+        Set<String> keySet = destroyMap.keySet();
         for (String key : keySet) {
             if (key.equals(activityName))
-                destoryMap.get(key).finish();
+                destroyMap.get(key).finish();
         }
     }
 
@@ -88,10 +88,17 @@ public class MyApplication extends Application {
      * 销毁指定Activity
      */
     public static void destroyAll() {
-        Set<String> keySet = destoryMap.keySet();
+        Set<String> keySet = destroyMap.keySet();
         for (String key : keySet) {
-            destoryMap.get(key).finish();
+            destroyMap.get(key).finish();
         }
+    }
+
+    /**
+     * 清空destoryMap
+     */
+    public static void clearDestroyMap() {
+        destroyMap.clear();
     }
 
 }

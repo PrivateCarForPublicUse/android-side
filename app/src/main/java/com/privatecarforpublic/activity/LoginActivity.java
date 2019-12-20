@@ -6,11 +6,21 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.EditText;
 
+import com.alibaba.fastjson.JSON;
+import com.google.gson.Gson;
 import com.privatecarforpublic.MainActivity;
 import com.privatecarforpublic.R;
 import com.privatecarforpublic.application.MyApplication;
+import com.privatecarforpublic.model.User;
+import com.privatecarforpublic.response.ResponseResult;
 import com.privatecarforpublic.util.CommonUtil;
+import com.privatecarforpublic.util.Constants;
+import com.privatecarforpublic.util.HttpRequestMethod;
+import com.privatecarforpublic.util.JsonUtil;
 import com.xiasuhuei321.loadingdialog.view.LoadingDialog;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,7 +40,6 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_user);
         init();
-        MyApplication.addDestroyActivity(this,TAG);
     }
 
     @OnClick(R.id.login)
@@ -40,10 +49,37 @@ public class LoginActivity extends Activity {
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(intent);
         //this.finish();
+        /*new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Map<String, Object> map=new HashMap<>();
+                    map.put("id",0);
+                    map.put("password","string");
+                    map.put("token","");
+                    String  param= JSON.toJSONString(map);
+                    ResponseResult responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpPost, "", Constants.SERVICE_ROOT+"user/", param);
+                    if(responseResult.getCode()!=200){
+                        CommonUtil.showMessage(LoginActivity.this,"登录出错");
+                        return;
+                    }
+                    Gson gson = new Gson();
+                    User user = gson.fromJson(responseResult.getData(), User.class);
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    intent.putExtra("user",user);
+                    startActivity(intent);
+                    LoginActivity.this.finish();
+                } catch (Exception e) {
+                    CommonUtil.showMessage(LoginActivity.this,"登录出错");
+                    e.printStackTrace();
+                }
+            }
+        }).start();*/
     }
 
     @OnClick(R.id.register)
     void register() {
+        MyApplication.addDestroyActivity(this,TAG);
         Intent intent = new Intent(LoginActivity.this, Register1Activity.class);
         startActivity(intent);
     }
