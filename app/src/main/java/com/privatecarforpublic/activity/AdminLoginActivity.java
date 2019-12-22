@@ -6,29 +6,19 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.EditText;
 
-import com.alibaba.fastjson.JSON;
-import com.google.gson.Gson;
 import com.jaeger.library.StatusBarUtil;
 import com.privatecarforpublic.MainActivity;
 import com.privatecarforpublic.R;
 import com.privatecarforpublic.application.MyApplication;
-import com.privatecarforpublic.model.User;
-import com.privatecarforpublic.response.ResponseResult;
 import com.privatecarforpublic.util.CommonUtil;
-import com.privatecarforpublic.util.Constants;
-import com.privatecarforpublic.util.HttpRequestMethod;
-import com.privatecarforpublic.util.JsonUtil;
 import com.xiasuhuei321.loadingdialog.view.LoadingDialog;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class LoginActivity extends Activity {
-    private static final String TAG = "LoginActivity";
+public class AdminLoginActivity extends Activity {
+    private static final String TAG = "AdminLoginActivity";
     @BindView(R.id.account)
     EditText account;
     @BindView(R.id.password)
@@ -39,19 +29,20 @@ public class LoginActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.login_user);
+        setContentView(R.layout.login_admin);
         init();
         //状态栏颜色设置
-        StatusBarUtil.setColor(LoginActivity.this, 25);
+        StatusBarUtil.setColor(AdminLoginActivity.this, 25);
     }
 
     @OnClick(R.id.login)
     void login() {
         ld.show();
         CommonUtil.processLoading(ld,1);
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        Intent intent = new Intent(AdminLoginActivity.this, AdminHomeActivity.class);
         startActivity(intent);
-        //this.finish();
+        this.finish();
+        MyApplication.destroyAll();
         /*new Thread(new Runnable() {
             @Override
             public void run() {
@@ -78,13 +69,6 @@ public class LoginActivity extends Activity {
                 }
             }
         }).start();*/
-    }
-
-    @OnClick(R.id.register)
-    void register() {
-        MyApplication.addDestroyActivity(this,TAG);
-        Intent intent = new Intent(LoginActivity.this, Register1Activity.class);
-        startActivity(intent);
     }
 
     private void init() {

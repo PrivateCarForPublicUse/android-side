@@ -51,4 +51,9 @@ public class User implements Serializable {
         private Long tid;
         //是否删除
         private int isDeleted;
+
+        public User(){
+                this.name="张三";
+                this.starLevel=2.5;
+        }
 }
