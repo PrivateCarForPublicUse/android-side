@@ -53,6 +53,7 @@
         <activity android:name=".activity.AdminLoginActivity" />
         <activity android:name=".activity.AdminHomeActivity" />
         <activity android:name=".activity.ReviewEmployeeActivity" />
+        <activity android:name=".activity.EmployeeDetailActivity" />
 
         <service android:name="com.amap.api.track.AMapTrackService" />
         <service android:name="com.amap.api.location.APSService" />

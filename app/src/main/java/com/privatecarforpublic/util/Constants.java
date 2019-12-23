@@ -5,7 +5,7 @@ public class Constants {
     public static final String UP_POINT = "https://tsapi.amap.com/v1/track/point/upload";
     public static final String SEARCH_TRACE = "https://tsapi.amap.com/v1/track/terminal/trsearch";
 
-    public static final String SERVICE_ROOT = "http://10.82.197.18:8080/";
+    public static final String SERVICE_ROOT = "http://192.168.137.1:8080/";
 
 
     public static final String SERVICE_KEY= "2dbf14313a05238dfe1e3b8f491af55d";

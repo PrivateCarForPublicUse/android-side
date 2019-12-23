@@ -58,7 +58,7 @@ public class ReviewEmployeeActivity extends Activity {
 
     @OnItemClick(R.id.employee_list)
     public void onPrivateItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Intent intent=new Intent(ReviewEmployeeActivity.this,SelectCarDetailActivity.class);
+        Intent intent=new Intent(ReviewEmployeeActivity.this,EmployeeDetailActivity.class);
         intent.putExtra("car",employeeList.get(i));
         startActivityForResult(intent,TO_REVIEW_EMPLOYEE);
     }
