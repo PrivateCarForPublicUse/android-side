@@ -1,19 +1,23 @@
 package com.privatecarforpublic.response;
 
+import com.google.gson.JsonObject;
+
+import org.json.JSONObject;
+
 import java.io.Serializable;
 
 public class ResponseResult implements Serializable {
     private static final long serialVersionUID = 4832771715671880043L;
     private Integer code;
-    private String msg;
+    private String message;
     private String data;
 
     public ResponseResult() {
     }
 
-    public ResponseResult(Integer code, String msg, String data) {
+    public ResponseResult(Integer code, String message, String data) {
         this.code = code;
-        this.msg = msg;
+        this.message = message;
         this.data = data;
     }
 
@@ -25,12 +29,12 @@ public class ResponseResult implements Serializable {
         this.code = code;
     }
 
-    public String getMsg() {
-        return this.msg;
+    public String getMessage() {
+        return message;
     }
 
-    public void setMsg(String msg) {
-        this.msg = msg;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public String getData() {

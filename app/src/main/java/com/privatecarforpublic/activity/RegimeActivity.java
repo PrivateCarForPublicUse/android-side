@@ -1,6 +1,7 @@
 package com.privatecarforpublic.activity;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,6 +10,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -20,9 +23,13 @@ import com.privatecarforpublic.R;
 import com.privatecarforpublic.adapter.SegmentAdapter;
 import com.privatecarforpublic.application.MyApplication;
 import com.privatecarforpublic.model.Segment;
+import com.privatecarforpublic.model.User;
+import com.privatecarforpublic.util.CommonUtil;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -34,7 +41,7 @@ import butterknife.OnItemClick;
 public class RegimeActivity extends Activity {
     private static final String TAG = "RegimeActivity";
 
-    private Calendar calendar= Calendar.getInstance(Locale.CHINA);
+    private Calendar calendar = Calendar.getInstance(Locale.CHINA);
     public final static int TO_SEARCH_DESTINATION = 101;
     public final static int TO_SEARCH_DEPARTURE = 102;
     public final static int TO_SHOW_CARS = 103;
@@ -45,12 +52,18 @@ public class RegimeActivity extends Activity {
     TextView title;
     @BindView(R.id.side)
     TextView side;
-    @BindView(R.id.time)
-    TextView time;
+    @BindView(R.id.start_time)
+    TextView start_time;
+    @BindView(R.id.end_time)
+    TextView end_time;
+    @BindView(R.id.reason)
+    EditText reason;
 
+    private User user;
     private List<Segment> segmentList;
     private SegmentAdapter segmentAdapter;
-    private String select_time;
+    private Date start;
+    private Date end;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +78,7 @@ public class RegimeActivity extends Activity {
     }
 
     private void init() {
+        user=(User)getIntent().getSerializableExtra("user");
         segmentList = new ArrayList<>();
         segmentList.add(newSegment());
         segmentAdapter = new SegmentAdapter(this, RegimeActivity.this, segmentList);
@@ -91,15 +105,34 @@ public class RegimeActivity extends Activity {
         segmentAdapter.notifyDataSetChanged();
     }
 
-    @OnClick(R.id.time)
-    void setTime() {
-        showTimePickerDialog(this,2,time,calendar);
+    @OnClick(R.id.start_time)
+    void setStartTime() {
+        start=new Date();
+        showTimePickerDialog(this, 2, start_time, calendar,start);
+        showDatePickerDialog(this, 2, calendar,start);
+    }
+
+    @OnClick(R.id.end_time)
+    void setEndTime() {
+        end=new Date();
+        showTimePickerDialog(this, 2, end_time, calendar,end);
+        showDatePickerDialog(this, 2, calendar,end);
     }
 
     @OnClick(R.id.regime)
     void toSelectCar() {
+        if(start==null||end==null||start.after(end)){
+            CommonUtil.showMessage(this,"时间填写有误");
+            return;
+        }else if(reason.getText().toString()==null||reason.getText().toString().length()==0){
+            CommonUtil.showMessage(this,"申请理由不能为空");
+            return;
+        }
         Intent intent = new Intent(RegimeActivity.this, SelectCarActivity.class);
-        startActivityForResult(intent,TO_SHOW_CARS);
+        intent.putExtra("startTime",start);
+        intent.putExtra("endTime",end);
+        intent.putExtra("user",user);
+        startActivityForResult(intent, TO_SHOW_CARS);
     }
 
     private Segment newSegment() {
@@ -146,22 +179,48 @@ public class RegimeActivity extends Activity {
         }
     }
 
-    private void showTimePickerDialog(Activity activity,int themeResId, final TextView tv, Calendar calendar) {
+    private void showTimePickerDialog(Activity activity, int themeResId, final TextView tv, Calendar calendar,Date date) {
         // 创建一个TimePickerDialog实例，并把它显示出来
         // 解释一哈，Activity是context的子类
-        new TimePickerDialog( activity,themeResId,
+        new TimePickerDialog(activity, themeResId,
                 // 绑定监听器
                 new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        tv.setText("出行时间：" + hourOfDay + "时" + minute  + "分");
+                        SimpleDateFormat sdf =new SimpleDateFormat("yyyy-MM-dd HH:mm" );
+                        date.setHours(hourOfDay);
+                        date.setMinutes(minute);
+                        String str = sdf.format(date);
+                        if(tv==start_time)
+                            tv.setText("开始时间："+str);
+                        else
+                            tv.setText("结束时间："+str);
                     }
                 }
                 // 设置初始时间
                 , calendar.get(Calendar.HOUR_OF_DAY)
                 , calendar.get(Calendar.MINUTE)
                 // true表示采用24小时制
-                ,true).show();
+                , true).show();
+    }
+
+    private void showDatePickerDialog(Activity activity, int themeResId, Calendar calendar,Date date) {
+        // 创建一个TimePickerDialog实例，并把它显示出来
+        // 解释一哈，Activity是context的子类
+        new DatePickerDialog(activity,themeResId,
+                new DatePickerDialog.OnDateSetListener() {
+                    //实现监听方法
+                    @Override
+                    public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
+                        //设置文本显示内容，i为年，i1为月，i2为日
+                        date.setYear(i-1900);
+                        date.setMonth(i1);
+                        date.setDate(i2);
+                    }
+                }
+                , calendar.get(Calendar.YEAR)
+                , calendar.get(Calendar.MONTH)
+                , calendar.get(Calendar.DATE)).show();//记得使用show才能显示悬浮窗
     }
 
 }

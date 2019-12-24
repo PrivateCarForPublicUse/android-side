@@ -15,6 +15,7 @@ import com.privatecarforpublic.R;
 import com.privatecarforpublic.application.MyApplication;
 import com.privatecarforpublic.util.CommonUtil;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,14 +26,19 @@ import butterknife.OnItemSelected;
 
 public class Register2Activity extends Activity {
     private static final String TAG = "Register2Activity";
+
     private List<String> cityList;
     private List<String> companyList;
+
+    private String select_company;
+    private String select_city;
+
     @BindView(R.id.city)
     Spinner city;
     @BindView(R.id.company)
     Spinner company;
-    @BindView(R.id.name)
-    EditText name;
+    @BindView(R.id.workNumber)
+    EditText workNumber;
 
     @BindView(R.id.title)
     TextView title;
@@ -52,20 +58,24 @@ public class Register2Activity extends Activity {
     }
 
     private void getCityList(){
-        String [] data = new String[]{"中国","捷克","日本","南京","重庆","成都"};
-        cityList= Arrays.asList(data);
-        /*String[] data = new String[cityList.size()];
-        cityList.toArray(data);*/
+        cityList=new ArrayList<>();
+        String[] data = new String[cityList.size()];
+        cityList.toArray(data);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_dropdown_item_1line,data);
         city.setAdapter(adapter);
     }
 
     @OnItemSelected(R.id.city)
-    public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-        String cardNumber = cityList.get(arg2);
-        CommonUtil.showMessage(Register2Activity.this,cardNumber);
+    public void onCitySelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+        select_city = cityList.get(arg2);
+        CommonUtil.showMessage(Register2Activity.this,select_city);
         getCompanyList();
+    }
+
+    @OnItemSelected(R.id.company)
+    public void onCompanySelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+        select_company = companyList.get(arg2);
     }
 
     private void getCompanyList(){
@@ -75,9 +85,12 @@ public class Register2Activity extends Activity {
     void next() {
         MyApplication.addDestroyActivity(this,TAG);
         Intent intent = new Intent(Register2Activity.this, IdCardActivity.class);
-        intent.putExtra("name", name.getText().toString());
+        intent.putExtra("workNumber", workNumber.getText().toString());
+        intent.putExtra("city", select_city);
+        intent.putExtra("company", select_company);
+        intent.putExtra("account",getIntent().getStringExtra("account"));
+        intent.putExtra("password",getIntent().getStringExtra("password"));
         startActivity(intent);
-
     }
 
     @OnClick(R.id.back)

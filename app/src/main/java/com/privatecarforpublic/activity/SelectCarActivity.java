@@ -3,19 +3,36 @@ package com.privatecarforpublic.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.jaeger.library.StatusBarUtil;
 import com.privatecarforpublic.R;
 import com.privatecarforpublic.adapter.CarAdapter;
 import com.privatecarforpublic.application.MyApplication;
 import com.privatecarforpublic.model.Car;
+import com.privatecarforpublic.model.User;
+import com.privatecarforpublic.response.ResponseResult;
+import com.privatecarforpublic.util.CommonUtil;
+import com.privatecarforpublic.util.Constants;
+import com.privatecarforpublic.util.HttpRequestMethod;
+import com.privatecarforpublic.util.JsonUtil;
+import com.privatecarforpublic.util.SharePreferenceUtil;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -40,6 +57,10 @@ public class SelectCarActivity extends Activity {
     private CarAdapter privateCarAdapter;
     private CarAdapter publicCarAdapter;
 
+    private User user;
+    private Date start;
+    private Date end;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,30 +74,69 @@ public class SelectCarActivity extends Activity {
     }
 
     private void init() {
-        privateCarList = new ArrayList<>();
-        privateCarList.add(new Car());
-        publicCarList = new ArrayList<>();
-        publicCarList.add(new Car());
-        publicCarList.add(new Car());
-        publicCarList.add(new Car());
-        privateCarAdapter = new CarAdapter(this, privateCarList, 1);
+        SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
+        start = (Date) getIntent().getSerializableExtra("startTime");
+        end = (Date) getIntent().getSerializableExtra("endTime");
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    //公有车列表
+                    Gson gson = new Gson();
+                    Map<String, Object> param = new HashMap<>();
+                    param.put("startTime", sdf.format(start));
+                    param.put("endTime", sdf.format(end));
+                    param.put("isMine", 0);
+                    ResponseResult responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpPost, SharePreferenceUtil.getString(SelectCarActivity.this, "token", ""), Constants.SERVICE_ROOT + "car/getCarByTime", param);
+                    if (responseResult.getCode() != 200) {
+                        CommonUtil.showMessage(SelectCarActivity.this, "无可用公车");
+                        publicCarList=new ArrayList<>();
+                    } else{
+                        publicCarList = gson.fromJson(responseResult.getData(), new TypeToken<List<Car>>() {
+                        }.getType());
+                    }
+
+                    //私有车列表
+                    param.put("isMine", 1);
+                    responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpPost, SharePreferenceUtil.getString(SelectCarActivity.this, "token", ""), Constants.SERVICE_ROOT + "car/getCarByTime", param);
+                    if (responseResult.getCode() != 200) {
+                        CommonUtil.showMessage(SelectCarActivity.this, "无可用私车");
+                        privateCarList = new ArrayList<>();
+                    }else{
+                        privateCarList = gson.fromJson(responseResult.getData(), new TypeToken<List<Car>>() {
+                        }.getType());
+                    }
+                } catch (Exception e) {
+                    CommonUtil.showMessage(SelectCarActivity.this, "查询可用车辆失败");
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         publicCarAdapter = new CarAdapter(this, publicCarList, 1);
-        private_car_list.setAdapter(privateCarAdapter);
         public_car_list.setAdapter(publicCarAdapter);
+
+        /*privateCarAdapter = new CarAdapter(this, privateCarList, 1);
+        private_car_list.setAdapter(privateCarAdapter);*/
     }
 
     @OnItemClick(R.id.private_car_list)
     public void onPrivateItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Intent intent=new Intent(SelectCarActivity.this,SelectCarDetailActivity.class);
-        intent.putExtra("car",privateCarList.get(i));
-        startActivityForResult(intent,TO_SELECT_CAR);
+        Intent intent = new Intent(SelectCarActivity.this, SelectCarDetailActivity.class);
+        intent.putExtra("car", privateCarList.get(i));
+        startActivityForResult(intent, TO_SELECT_CAR);
     }
 
     @OnItemClick(R.id.public_car_list)
     public void onPublicItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Intent intent=new Intent(SelectCarActivity.this,SelectCarDetailActivity.class);
-        intent.putExtra("car",publicCarList.get(i));
-        startActivityForResult(intent,TO_SELECT_CAR);
+        Intent intent = new Intent(SelectCarActivity.this, SelectCarDetailActivity.class);
+        intent.putExtra("car", publicCarList.get(i));
+        startActivityForResult(intent, TO_SELECT_CAR);
     }
 
     @OnClick(R.id.back)

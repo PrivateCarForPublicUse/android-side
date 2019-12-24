@@ -5,6 +5,9 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.privatecarforpublic.response.ResponseResult;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -30,6 +33,7 @@ public class JsonUtil {
                 break;
             case HttpPost:
                 body = RequestBody.create(JSON, json);
+                Log.e(TAG, json);
                 if(token==null)
                     request = new Request.Builder().url(url).post(body).build();
                 else
@@ -46,10 +50,19 @@ public class JsonUtil {
         try {
             Response response = new OkHttpClient().newCall(request).execute();
             String result = response.body().string();
-            return gson.fromJson(result,ResponseResult.class);
+            Log.e(TAG, result);
+            return convert(result);
         } catch (Exception e) {
             Log.e(TAG, e.toString());
             return null;
         }
+    }
+    public static ResponseResult convert(String json) throws JSONException {
+        JSONObject jsonObject = new JSONObject(json);
+        ResponseResult responseResult = new ResponseResult();
+        responseResult.setCode(jsonObject.getInt("code"));
+        responseResult.setMessage(jsonObject.getString("message"));
+        responseResult.setData(jsonObject.getString("data"));
+        return responseResult;
     }
 }

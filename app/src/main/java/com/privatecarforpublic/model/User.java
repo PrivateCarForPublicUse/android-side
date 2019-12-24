@@ -55,5 +55,6 @@ public class User implements Serializable {
         public User(){
                 this.name="张三";
                 this.starLevel=2.5;
+                this.tid=(long)233520958;
         }
 }

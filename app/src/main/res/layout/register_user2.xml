@@ -29,11 +29,11 @@
             android:background="@drawable/edit_sharp"/>
 
         <EditText
-            android:id="@+id/name"
+            android:id="@+id/workNumber"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginTop="21dp"
-            android:hint="真实姓名"
+            android:hint="工号"
             android:inputType="text"
             android:textColor="@color/grey"
             android:textColorHint="@color/grey"

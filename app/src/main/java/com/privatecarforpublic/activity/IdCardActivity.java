@@ -78,7 +78,12 @@ public class IdCardActivity extends Activity {
         Intent intent = new Intent(IdCardActivity.this, DriverLicenseActivity.class);
         intent.putExtra("name", name);
         intent.putExtra("idNumber", idNumber);
-        intent.putExtra("expiryDate", expiryDate);
+        //intent.putExtra("expiryDate", expiryDate);
+        intent.putExtra("account",getIntent().getStringExtra("account"));
+        intent.putExtra("password",getIntent().getStringExtra("password"));
+        intent.putExtra("workNumber",getIntent().getStringExtra("workNumber"));
+        intent.putExtra("city",getIntent().getStringExtra("city"));
+        intent.putExtra("company",getIntent().getStringExtra("company"));
         startActivity(intent);
     }
 

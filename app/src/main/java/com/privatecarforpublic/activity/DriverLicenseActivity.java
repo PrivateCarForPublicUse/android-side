@@ -25,6 +25,7 @@ import com.jaeger.library.StatusBarUtil;
 import com.privatecarforpublic.MainActivity;
 import com.privatecarforpublic.R;
 import com.privatecarforpublic.application.MyApplication;
+import com.privatecarforpublic.util.CommonUtil;
 import com.privatecarforpublic.util.Constants;
 import com.privatecarforpublic.util.FileUtil;
 
@@ -73,11 +74,20 @@ public class DriverLicenseActivity extends Activity {
 
     @OnClick(R.id.side)
     void next() {
+        if(!name.equals(getIntent().getStringExtra("name"))){
+            CommonUtil.showMessage(this,"人证不一致，请重新拍摄！");
+            return;
+        }
         MyApplication.addDestroyActivity(this,TAG);
         Intent intent = new Intent(DriverLicenseActivity.this, MainActivity.class);
         intent.putExtra("name", name);
         intent.putExtra("idNumber", idNumber);
         intent.putExtra("expiryDate", expiryDate);
+        String account=getIntent().getStringExtra("account");
+        String password=getIntent().getStringExtra("password");
+        String workNumber=getIntent().getStringExtra("workNumber");
+        String city=getIntent().getStringExtra("city");
+        String company=getIntent().getStringExtra("company");
         startActivity(intent);
         MyApplication.destroyAll();
     }

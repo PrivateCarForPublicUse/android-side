@@ -12,13 +12,17 @@ import com.jaeger.library.StatusBarUtil;
 import com.privatecarforpublic.MainActivity;
 import com.privatecarforpublic.R;
 import com.privatecarforpublic.application.MyApplication;
+import com.privatecarforpublic.model.Account;
 import com.privatecarforpublic.model.User;
 import com.privatecarforpublic.response.ResponseResult;
 import com.privatecarforpublic.util.CommonUtil;
 import com.privatecarforpublic.util.Constants;
 import com.privatecarforpublic.util.HttpRequestMethod;
 import com.privatecarforpublic.util.JsonUtil;
+import com.privatecarforpublic.util.SharePreferenceUtil;
 import com.xiasuhuei321.loadingdialog.view.LoadingDialog;
+
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,27 +51,29 @@ public class LoginActivity extends Activity {
 
     @OnClick(R.id.login)
     void login() {
-        ld.show();
+        //ld.show();
         CommonUtil.processLoading(ld,1);
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-        startActivity(intent);
+        /*Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent);*/
         //this.finish();
-        /*new Thread(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    Map<String, Object> map=new HashMap<>();
-                    map.put("id",0);
-                    map.put("password","string");
-                    map.put("token","");
-                    String  param= JSON.toJSONString(map);
-                    ResponseResult responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpPost, "", Constants.SERVICE_ROOT+"user/", param);
+                    Gson gson = new Gson();
+                    Map<String, Object> param=new HashMap<>();
+                    param.put("phoneNumber",account.getText().toString());
+                    param.put("password",password.getText().toString());
+                    ResponseResult responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpPost, null, Constants.SERVICE_ROOT+"authorize/login/phone", param);
                     if(responseResult.getCode()!=200){
-                        CommonUtil.showMessage(LoginActivity.this,"登录出错");
+                        CommonUtil.showMessage(LoginActivity.this,"账号或密码错误");
                         return;
                     }
-                    Gson gson = new Gson();
-                    User user = gson.fromJson(responseResult.getData(), User.class);
+                    JSONObject jsonObject = new JSONObject(responseResult.getData());
+                    User user = gson.fromJson(jsonObject.getString("user"), User.class);
+                    Account account = gson.fromJson(jsonObject.getString("account"), Account.class);
+                    SharePreferenceUtil.setString(LoginActivity.this, "token", account.getToken());
+                    SharePreferenceUtil.setString(LoginActivity.this, "userId", user.getId() + "");
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     intent.putExtra("user",user);
                     startActivity(intent);
@@ -77,7 +83,7 @@ public class LoginActivity extends Activity {
                     e.printStackTrace();
                 }
             }
-        }).start();*/
+        }).start();
     }
 
     @OnClick(R.id.register)

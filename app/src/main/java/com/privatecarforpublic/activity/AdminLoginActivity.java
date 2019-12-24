@@ -37,7 +37,7 @@ public class AdminLoginActivity extends Activity {
 
     @OnClick(R.id.login)
     void login() {
-        ld.show();
+        //ld.show();
         CommonUtil.processLoading(ld,1);
         Intent intent = new Intent(AdminLoginActivity.this, AdminHomeActivity.class);
         startActivity(intent);

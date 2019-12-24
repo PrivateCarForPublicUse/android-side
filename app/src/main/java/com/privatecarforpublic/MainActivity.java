@@ -23,6 +23,8 @@ import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.AMapUtils;
+import com.amap.api.maps.CameraUpdate;
+import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.model.BitmapDescriptor;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
@@ -30,7 +32,12 @@ import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.amap.api.maps.model.Polyline;
 import com.amap.api.maps.model.PolylineOptions;
-import com.amap.api.services.help.Tip;
+import com.amap.api.services.core.LatLonPoint;
+import com.amap.api.services.route.BusRouteResult;
+import com.amap.api.services.route.DriveRouteResult;
+import com.amap.api.services.route.RideRouteResult;
+import com.amap.api.services.route.RouteSearch;
+import com.amap.api.services.route.WalkRouteResult;
 import com.amap.api.track.AMapTrackClient;
 import com.amap.api.track.ErrorCode;
 import com.amap.api.track.OnTrackLifecycleListener;
@@ -40,6 +47,7 @@ import com.amap.api.track.query.model.AddTerminalRequest;
 import com.amap.api.track.query.model.AddTerminalResponse;
 import com.amap.api.track.query.model.AddTrackRequest;
 import com.amap.api.track.query.model.AddTrackResponse;
+import com.amap.api.track.query.model.DistanceRequest;
 import com.amap.api.track.query.model.DistanceResponse;
 import com.amap.api.track.query.model.HistoryTrackResponse;
 import com.amap.api.track.query.model.LatestPointResponse;
@@ -54,11 +62,10 @@ import com.privatecarforpublic.activity.MyTravelsActivity;
 import com.privatecarforpublic.activity.RegimeActivity;
 import com.privatecarforpublic.activity.ReimbursementActivity;
 import com.privatecarforpublic.activity.RemainingSegmentActivity;
-import com.privatecarforpublic.activity.SearchPlaceActivity;
-import com.privatecarforpublic.model.MyTravels;
-import com.privatecarforpublic.application.MyApplication;
+import com.privatecarforpublic.model.User;
 import com.privatecarforpublic.util.CommonUtil;
 import com.privatecarforpublic.util.Constants;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,11 +74,16 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.amap.api.services.route.RouteSearch.DRIVING_SINGLE_SHORTEST;
+
 public class MainActivity extends Activity
         implements NavigationView.OnNavigationItemSelectedListener {
     public final static int TO_REGIME=201;
     public final static int TO_CHOOSE_SEGMENT=202;
 
+    private float plannedDistance;
+    private double actualDistance;
+    private User user;
     private String terminalName="test";
     private Long terminalId=(long)-1;
     private Long trackId=(long)-1;
@@ -81,11 +93,9 @@ public class MainActivity extends Activity
     //轨迹跟踪客户端
     private AMapTrackClient aMapTrackClient;
     private List<LatLng> latLngList=new ArrayList<>();
-    private double latitude;
-    private double longitude;
+    private LatLonPoint startPoint;
+    private LatLonPoint endPoint;
 
-    @BindView(R.id.function)
-    ImageView function;
     @BindView(R.id.destination)
     TextView destination;
     @BindView(R.id.start)
@@ -111,6 +121,7 @@ public class MainActivity extends Activity
     @OnClick(R.id.destination)
     void toSelectDestination(){
         Intent intent = new Intent(MainActivity.this, RegimeActivity.class);
+        intent.putExtra("user",user);
         startActivityForResult(intent, TO_REGIME);
     }
 
@@ -137,6 +148,15 @@ public class MainActivity extends Activity
         TrackParam trackParam = new TrackParam(Long.parseLong(Constants.SERVICE_ID), terminalId);
         trackParam.setTrackId(trackId);
         aMapTrackClient.stopTrack(trackParam, onTrackLifecycleListener);
+        long curr = System.currentTimeMillis();
+        DistanceRequest distanceRequest = new DistanceRequest(
+                Long.parseLong(Constants.SERVICE_ID),
+                terminalId,
+                curr - 12 * 60 * 60 * 1000, // 开始时间
+                curr,   // 结束时间
+                -1  // 轨迹id，传-1表示包含散点在内的所有轨迹点
+        );
+        aMapTrackClient.queryDistance(distanceRequest,onTrackListener);
     }
 
     @Override
@@ -157,6 +177,12 @@ public class MainActivity extends Activity
 
     private void init(){
         ButterKnife.bind(this);
+        user=(User)getIntent().getSerializableExtra("user");
+        View headView=navigationView.getHeaderView(0);
+        ImageView head_image=headView.findViewById(R.id.head_image);
+        TextView username=headView.findViewById(R.id.username);
+        Picasso.get().load(user.getHeadPhotoUrl()).into(head_image);
+        username.setText(user.getUserName());
         start.setVisibility(View.INVISIBLE);
         cancel.setVisibility(View.INVISIBLE);
         finish.setVisibility(View.INVISIBLE);
@@ -243,6 +269,7 @@ public class MainActivity extends Activity
         aMapTrackClient.setLocationMode(LocationMode.HIGHT_ACCURACY);
         //这一步将直接创建TRACK并开启跟踪上报
         aMapTrackClient.queryTerminal(new QueryTerminalRequest(Long.parseLong(Constants.SERVICE_ID), terminalName), onTrackListener);
+        calculate();
     }
 
     //实现实时定位
@@ -286,11 +313,22 @@ public class MainActivity extends Activity
         myLocationStyle.strokeWidth((float) 0);
         myLocationStyle.radiusFillColor(Color.TRANSPARENT);
         myLocationStyle.interval(2000); //设置连续定位模式下的定位间隔，只在连续定位模式下生效，单次定位模式下不会生效。单位为毫秒。
+        //设置希望展示的地图缩放级别
+        CameraUpdate mCameraUpdate = CameraUpdateFactory.zoomTo(15);
+        aMap.animateCamera(mCameraUpdate);
         aMap.setMyLocationStyle(myLocationStyle);//设置定位蓝点的Style
         aMap.getUiSettings().setMyLocationButtonEnabled(false);//设置默认定位按钮是否显示，非必需设置。
         aMap.getUiSettings().setZoomControlsEnabled(false);//设置地图放大缩小的按钮不显示，可通过手势进行控制
         aMap.setMyLocationEnabled(true);// 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false
         //aMap.setOnMyLocationChangeListener(mAMapLocationListener);
+    }
+
+    private void calculate(){
+        RouteSearch routeSearch=new RouteSearch(this);
+        routeSearch.setRouteSearchListener(onRouteSearchListener);
+        RouteSearch.FromAndTo fromAndTo=new RouteSearch.FromAndTo(startPoint,endPoint);
+        RouteSearch.DriveRouteQuery query = new RouteSearch.DriveRouteQuery(fromAndTo, DRIVING_SINGLE_SHORTEST, null, null, "");
+        routeSearch.calculateDriveRouteAsyn(query);
     }
 
     @Override
@@ -326,8 +364,8 @@ public class MainActivity extends Activity
             if (amapLocation != null) {
                 if (amapLocation.getErrorCode() == 0) {
                     //可在其中解析amapLocation获取相应内容。
-                    latitude=amapLocation.getLatitude();//获取纬度
-                    longitude=amapLocation.getLongitude();//获取经度
+                    double latitude=amapLocation.getLatitude();//获取纬度
+                    double longitude=amapLocation.getLongitude();//获取经度
                     //Toast.makeText(MainActivity.this, "经度:" + longitude+"纬度:"+latitude, Toast.LENGTH_SHORT).show();
 
                     //测距
@@ -436,7 +474,13 @@ public class MainActivity extends Activity
 
         @Override
         public void onDistanceCallback(DistanceResponse distanceResponse) {
-
+            if (distanceResponse.isSuccess()) {
+                actualDistance = distanceResponse.getDistance();
+                // 行驶里程查询成功，行驶了meters米
+            } else {
+                // 行驶里程查询失败
+                CommonUtil.showMessage(MainActivity.this,"实际里程查询失败");
+            }
         }
 
         @Override
@@ -469,6 +513,31 @@ public class MainActivity extends Activity
 
         @Override
         public void onParamErrorCallback(ParamErrorResponse paramErrorResponse) {
+
+        }
+    };
+    RouteSearch.OnRouteSearchListener onRouteSearchListener=new RouteSearch.OnRouteSearchListener() {
+        @Override
+        public void onBusRouteSearched(BusRouteResult busRouteResult, int i) {
+
+        }
+
+        @Override
+        public void onDriveRouteSearched(DriveRouteResult driveRouteResult, int i) {
+            if(i==1000){
+                plannedDistance=driveRouteResult.getPaths().get(0).getTollDistance();
+            }else{
+                CommonUtil.showMessage(MainActivity.this,"计算规划路程出错");
+            }
+        }
+
+        @Override
+        public void onWalkRouteSearched(WalkRouteResult walkRouteResult, int i) {
+
+        }
+
+        @Override
+        public void onRideRouteSearched(RideRouteResult rideRouteResult, int i) {
 
         }
     };

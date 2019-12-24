@@ -63,6 +63,10 @@ public class AdminHomeActivity extends Activity {
                 Intent intent = new Intent(AdminHomeActivity.this, ReviewEmployeeActivity.class);
                 startActivity(intent);
                 break;
+            case (6):
+                Intent intent6 = new Intent(AdminHomeActivity.this, MonitorListActivity.class);
+                startActivity(intent6);
+                break;
             default:
                 break;
         }
