@@ -1,6 +1,7 @@
 package com.privatecarforpublic.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,10 +10,18 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.privatecarforpublic.R;
 import com.privatecarforpublic.adapter.MyTravelsAdapter;
 import com.privatecarforpublic.model.MyTravels;
+import com.privatecarforpublic.model.User;
+import com.privatecarforpublic.response.ResponseResult;
 import com.privatecarforpublic.util.CommonUtil;
+import com.privatecarforpublic.util.Constants;
+import com.privatecarforpublic.util.HttpRequestMethod;
+import com.privatecarforpublic.util.JsonUtil;
+import com.privatecarforpublic.util.SharePreferenceUtil;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.constant.SpinnerStyle;
 import com.scwang.smartrefresh.layout.footer.BallPulseFooter;
@@ -21,18 +30,21 @@ import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import lombok.Builder;
 
 /**
  * @description 我的行程列表界面
  */
 public class MyTravelsActivity extends Activity {
     private List<MyTravels> myTravelsList = new ArrayList<>();
-
+    private String userId = null;
     @BindView(R.id.title)
     TextView title;
     @BindView(R.id.my_travels_list)
@@ -85,9 +97,32 @@ public class MyTravelsActivity extends Activity {
 
     private void init() {
         for (int i = 0; i < 24; ++i) {
-            MyTravels myTravels = new MyTravels(new Date(), "始   " + "浙江大学宁波软院",
-                    "终" + "浙江大学宁波软院", false, false);
+            MyTravels myTravels = new MyTravels().builder().carStartTime(new Date().toString()).origin("始   " + "浙江大学宁波软院")
+                    .destination("终   " + "浙江大学宁波软院").status(1).isReimburse(0).build();
             myTravelsList.add(myTravels);
         }
+        /*Thread thread = new Thread(()->{
+            try{
+                Gson gson = new Gson();
+                userId = SharePreferenceUtil.getString(MyTravelsActivity.this,"userId","");
+                ResponseResult responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpGet, SharePreferenceUtil
+                        .getString(MyTravelsActivity.this, "token", ""), Constants.SERVICE_ROOT + "car/Route/userId?userId=" + userId, null);
+                if(responseResult.getCode() != 200){
+                    CommonUtil.showMessage(MyTravelsActivity.this,"无相应的出行路程！");
+                    myTravelsList.clear();
+                }else{
+                    myTravelsList = gson.fromJson(responseResult.getData(),new TypeToken<List<MyTravels>>(){
+                    }.getType());
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        });
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
     }
 }

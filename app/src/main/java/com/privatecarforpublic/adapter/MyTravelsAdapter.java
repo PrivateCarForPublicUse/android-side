@@ -45,9 +45,9 @@ public class MyTravelsAdapter extends ArrayAdapter<MyTravels> {
             viewHolder = (ViewHolder) view.getTag();
         }
 
-        viewHolder.date.setText(myTravels.getDate().toString());
-        viewHolder.start.setText(myTravels.getStart());
-        viewHolder.end.setText(myTravels.getEnd());
+        viewHolder.date.setText(myTravels.getCarStartTime().toString());
+        viewHolder.start.setText(myTravels.getOrigin());
+        viewHolder.end.setText(myTravels.getDestination());
         return view;
     }
 

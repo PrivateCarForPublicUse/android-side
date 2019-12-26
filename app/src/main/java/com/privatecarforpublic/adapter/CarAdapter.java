@@ -59,8 +59,8 @@ public class CarAdapter extends BaseAdapter{
             else if(pageKind == 2){
                 convertView = LayoutInflater.from(mContext).inflate(R.layout.my_car_item, parent, false);
                 holder.picture = convertView.findViewById(R.id.my_cars_img);
-                holder.journey = convertView.findViewById(R.id.my_cars_journey);
-                holder.brand = convertView.findViewById(R.id.my_cars_name);
+                holder.mileage = convertView.findViewById(R.id.my_cars_mileage);
+                holder.license = convertView.findViewById(R.id.my_cars_licence);
                 holder.star = convertView.findViewById(R.id.my_cars_star1);
             }
             convertView.setTag(holder);
@@ -75,8 +75,9 @@ public class CarAdapter extends BaseAdapter{
             holder.star.setText(car.getStarOfCar()+"");
         }
         else if(pageKind == 2){
-            holder.brand.setText(car.getBrand());
-            holder.journey.setText(car.getJourney()+MILE);
+            holder.license.setText(car.getLicense());
+            //`holder.brand.setText(car.getBrand());
+            holder.mileage.setText(car.getMileage()+MILE);
             holder.star.setText(car.getStarOfCar()+"");
         }
 
@@ -85,7 +86,7 @@ public class CarAdapter extends BaseAdapter{
 
     private class ViewHolder {
         private ImageView picture;
-        private TextView journey;
+        private TextView mileage;
         private TextView brand;
         private TextView license;
         private TextView type;

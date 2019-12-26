@@ -32,10 +32,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="车名:  " />
+                android:text="车牌:  " />
 
             <TextView
-                android:id="@+id/my_cars_name"
+                android:id="@+id/my_cars_licence"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="保时捷卡宴" />
@@ -53,7 +53,7 @@
                 android:text="行驶里程:  " />
 
             <TextView
-                android:id="@+id/my_cars_journey"
+                android:id="@+id/my_cars_mileage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="30公里" />

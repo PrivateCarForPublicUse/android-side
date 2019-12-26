@@ -22,8 +22,6 @@ public class Car implements Serializable {
     //车辆品牌
     private String type;
     //车辆型号
-    private double journey;
-    //以行驶的路程
     private double starOfCar;
     //车辆星级
     private String insuranceCompany;
@@ -44,6 +42,10 @@ public class Car implements Serializable {
     //车辆公用结束时间
     private double displacement;
     //车辆排量
+    //是否删除
+    private int isDeleted;
+    //总行驶里程(km)
+    private double mileage;
 
     public Car(){
         this.license="浙BE693F";

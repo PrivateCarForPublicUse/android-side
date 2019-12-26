@@ -6,17 +6,27 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.privatecarforpublic.R;
 import com.privatecarforpublic.adapter.CarAdapter;
 import com.privatecarforpublic.model.Car;
+import com.privatecarforpublic.model.User;
+import com.privatecarforpublic.response.ResponseResult;
 import com.privatecarforpublic.util.CommonUtil;
+import com.privatecarforpublic.util.Constants;
+import com.privatecarforpublic.util.HttpRequestMethod;
+import com.privatecarforpublic.util.JsonUtil;
+import com.privatecarforpublic.util.SharePreferenceUtil;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.constant.SpinnerStyle;
 import com.scwang.smartrefresh.layout.footer.BallPulseFooter;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -58,10 +68,10 @@ public class MyCarsActivity extends Activity {
         side.setText("增加");
 
         init();
-        CarAdapter carAdapter = new CarAdapter(MyCarsActivity.this, carList,2);
+        CarAdapter carAdapter = new CarAdapter(MyCarsActivity.this, carList, 2);
         listView.setAdapter(carAdapter);
 
-        CarAdapter carAdapter1 = new CarAdapter(MyCarsActivity.this, carList1,2);
+        CarAdapter carAdapter1 = new CarAdapter(MyCarsActivity.this, carList1, 2);
         listView1.setAdapter(carAdapter1);
 
         listView.setOnItemClickListener(((parent, view, position, id) -> {
@@ -98,16 +108,42 @@ public class MyCarsActivity extends Activity {
     }
 
     private void init() {
-        for (int i = 0; i < 10; ++i) {
-            Car car = new Car().builder().brand("保时捷卡宴111" + i)
-                    .journey(30).starOfCar(i % 5 + 1).build();
-            carList.add(car);
-        }
+        Thread thread = new Thread(() -> {
+            try {
+                //私有
+                Gson gson = new Gson();
+                ResponseResult responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpGet,
+                        SharePreferenceUtil.getString(MyCarsActivity.this, "token", ""),
+                        Constants.SERVICE_ROOT + "car/getMyCar?isPublic=0", null);
+                if (responseResult.getCode() != 200) {
+                    CommonUtil.showMessage(MyCarsActivity.this, "无可用公车");
+                    carList.clear();
+                } else {
+                    carList = gson.fromJson(responseResult.getData(), new TypeToken<List<Car>>() {
+                    }.getType());
+                }
 
-        for (int i = 0; i < 5; ++i) {
-            Car car = new Car().builder().brand("保时捷卡宴222")
-                    .journey(30).starOfCar(i % 5 + 1).build();
-            carList1.add(car);
+                //共有
+                responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpGet,
+                        SharePreferenceUtil.getString(MyCarsActivity.this, "token", ""),
+                        Constants.SERVICE_ROOT + "car/getMyCar?isPublic=1", null);
+                if (responseResult.getCode() != 200) {
+                    CommonUtil.showMessage(MyCarsActivity.this, "无可用公车");
+                    carList1.clear();
+                } else {
+                    carList1 = gson.fromJson(responseResult.getData(), new TypeToken<List<Car>>() {
+                    }.getType());
+                }
+            } catch (Exception e) {
+                CommonUtil.showMessage(MyCarsActivity.this, "查询可用车辆失败");
+                e.printStackTrace();
+            }
+        });
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }
