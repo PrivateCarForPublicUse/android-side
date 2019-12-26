@@ -45,6 +45,7 @@ public class AdminHomeActivity extends Activity {
     private void init() {
         functionList = new ArrayList<>();
         functionList.add(new Function(R.drawable.star, "员工审核"));
+        functionList.add(new Function(R.drawable.star, "用车审核"));
         functionList.add(new Function(R.drawable.star, "车辆审核"));
         functionList.add(new Function(R.drawable.star, "报销审核"));
         functionList.add(new Function(R.drawable.star, "用车记录"));
@@ -63,9 +64,13 @@ public class AdminHomeActivity extends Activity {
                 Intent intent = new Intent(AdminHomeActivity.this, ReviewEmployeeActivity.class);
                 startActivity(intent);
                 break;
-            case (6):
-                Intent intent6 = new Intent(AdminHomeActivity.this, MonitorListActivity.class);
-                startActivity(intent6);
+            case (1):
+                Intent intent1 = new Intent(AdminHomeActivity.this, ApplyListActivity.class);
+                startActivity(intent1);
+                break;
+            case (7):
+                Intent intent7 = new Intent(AdminHomeActivity.this, MonitorListActivity.class);
+                startActivity(intent7);
                 break;
             default:
                 break;

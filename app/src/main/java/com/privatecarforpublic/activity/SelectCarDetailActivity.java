@@ -15,6 +15,7 @@ import com.privatecarforpublic.R;
 import com.privatecarforpublic.model.ApplyCarDTO;
 import com.privatecarforpublic.model.Car;
 import com.privatecarforpublic.model.PointLatDTO;
+import com.privatecarforpublic.model.Route;
 import com.privatecarforpublic.response.ResponseResult;
 import com.privatecarforpublic.util.CommonUtil;
 import com.privatecarforpublic.util.Constants;
@@ -103,7 +104,10 @@ public class SelectCarDetailActivity extends Activity {
                         return;
                     } else{
                         CommonUtil.showMessage(SelectCarDetailActivity.this, "申请发送成功");
+                        Gson gson = new Gson();
+                        Route route = gson.fromJson(responseResult.getData(), Route.class);
                         Intent intent = new Intent();
+                        intent.putExtra("routeId",route.getId());
                         setResult(Activity.RESULT_OK, intent);
                         finish();
                     }

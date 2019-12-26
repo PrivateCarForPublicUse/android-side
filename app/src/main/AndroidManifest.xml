@@ -57,6 +57,8 @@
         <activity android:name=".activity.EmployeeDetailActivity" />
         <activity android:name=".activity.MonitorActivity" />
         <activity android:name=".activity.MonitorListActivity" />
+        <activity android:name=".activity.ApplyListActivity" />
+        <activity android:name=".activity.ReviewApplyActivity" />
 
         <service android:name="com.amap.api.track.AMapTrackService" />
         <service android:name="com.amap.api.location.APSService" />
