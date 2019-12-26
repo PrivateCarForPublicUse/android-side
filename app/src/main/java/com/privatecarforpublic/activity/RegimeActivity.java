@@ -9,10 +9,8 @@ import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -21,11 +19,12 @@ import com.amap.api.services.help.Tip;
 import com.jaeger.library.StatusBarUtil;
 import com.privatecarforpublic.R;
 import com.privatecarforpublic.adapter.SegmentAdapter;
-import com.privatecarforpublic.application.MyApplication;
+import com.privatecarforpublic.model.PointLatDTO;
 import com.privatecarforpublic.model.Segment;
 import com.privatecarforpublic.model.User;
 import com.privatecarforpublic.util.CommonUtil;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -36,7 +35,6 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.OnItemClick;
 
 public class RegimeActivity extends Activity {
     private static final String TAG = "RegimeActivity";
@@ -61,6 +59,8 @@ public class RegimeActivity extends Activity {
 
     private User user;
     private List<Segment> segmentList;
+    private List<PointLatDTO> pointList;
+    private List<String> nameList;
     private SegmentAdapter segmentAdapter;
     private Date start;
     private Date end;
@@ -128,10 +128,27 @@ public class RegimeActivity extends Activity {
             CommonUtil.showMessage(this,"申请理由不能为空");
             return;
         }
+        pointList=new ArrayList<>();
+        nameList=new ArrayList<>();
+        for(int i=0;i<segmentList.size();i++){
+            String longitude=segmentList.get(i).getDeparture().getPoint().getLongitude()+"";
+            String latitude=segmentList.get(i).getDeparture().getPoint().getLatitude()+"";
+            pointList.add(new PointLatDTO(longitude,latitude));
+            nameList.add(segmentList.get(i).getDeparture().getName());
+            if(i==segmentList.size()-1){
+                longitude=segmentList.get(i).getDestination().getPoint().getLongitude()+"";
+                latitude=segmentList.get(i).getDestination().getPoint().getLatitude()+"";
+                pointList.add(new PointLatDTO(longitude,latitude));
+                nameList.add(segmentList.get(i).getDestination().getName());
+            }
+        }
         Intent intent = new Intent(RegimeActivity.this, SelectCarActivity.class);
         intent.putExtra("startTime",start);
         intent.putExtra("endTime",end);
         intent.putExtra("user",user);
+        intent.putExtra("reason",reason.getText().toString());
+        intent.putExtra("pointList",(Serializable) pointList);
+        intent.putExtra("nameList",(Serializable) nameList);
         startActivityForResult(intent, TO_SHOW_CARS);
     }
 
@@ -150,6 +167,8 @@ public class RegimeActivity extends Activity {
             Tip tip = (Tip) data.getParcelableExtra("tip");
             int position = data.getIntExtra("position", 0);
             segmentList.get(position).setDestination(tip);
+            if(segmentList.size()>position+1)
+                segmentList.get(position+1).setDeparture(tip);
             segmentAdapter.notifyDataSetChanged();
         } else if (requestCode == TO_SEARCH_DEPARTURE && resultCode == Activity.RESULT_OK) {
             Tip tip = (Tip) data.getParcelableExtra("tip");

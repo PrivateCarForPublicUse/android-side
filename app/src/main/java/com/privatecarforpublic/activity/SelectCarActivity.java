@@ -3,7 +3,6 @@ package com.privatecarforpublic.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -14,8 +13,8 @@ import com.google.gson.reflect.TypeToken;
 import com.jaeger.library.StatusBarUtil;
 import com.privatecarforpublic.R;
 import com.privatecarforpublic.adapter.CarAdapter;
-import com.privatecarforpublic.application.MyApplication;
 import com.privatecarforpublic.model.Car;
+import com.privatecarforpublic.model.PointLatDTO;
 import com.privatecarforpublic.model.User;
 import com.privatecarforpublic.response.ResponseResult;
 import com.privatecarforpublic.util.CommonUtil;
@@ -24,9 +23,7 @@ import com.privatecarforpublic.util.HttpRequestMethod;
 import com.privatecarforpublic.util.JsonUtil;
 import com.privatecarforpublic.util.SharePreferenceUtil;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -60,6 +57,9 @@ public class SelectCarActivity extends Activity {
     private User user;
     private Date start;
     private Date end;
+    private String reason;
+    private List<PointLatDTO> pointList;
+    private List<String> nameList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,14 +121,21 @@ public class SelectCarActivity extends Activity {
         publicCarAdapter = new CarAdapter(this, publicCarList, 1);
         public_car_list.setAdapter(publicCarAdapter);
 
-        /*privateCarAdapter = new CarAdapter(this, privateCarList, 1);
-        private_car_list.setAdapter(privateCarAdapter);*/
+        privateCarAdapter = new CarAdapter(this, privateCarList, 1);
+        private_car_list.setAdapter(privateCarAdapter);
     }
 
     @OnItemClick(R.id.private_car_list)
     public void onPrivateItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
         Intent intent = new Intent(SelectCarActivity.this, SelectCarDetailActivity.class);
         intent.putExtra("car", privateCarList.get(i));
+        intent.putExtra("startTime",sdf.format((Date) getIntent().getSerializableExtra("startTime")));
+        intent.putExtra("endTime",sdf.format((Date) getIntent().getSerializableExtra("endTime")));
+        intent.putExtra("user",getIntent().getSerializableExtra("user"));
+        intent.putExtra("reason",getIntent().getStringExtra("reason"));
+        intent.putExtra("pointList",getIntent().getSerializableExtra("pointList"));
+        intent.putExtra("nameList",getIntent().getSerializableExtra("nameList"));
         startActivityForResult(intent, TO_SELECT_CAR);
     }
 
