@@ -53,12 +53,15 @@
         <activity android:name=".activity.ChooseTypeActivity" />
         <activity android:name=".activity.AdminLoginActivity" />
         <activity android:name=".activity.AdminHomeActivity" />
-        <activity android:name=".activity.ReviewEmployeeActivity" />
+        <activity android:name=".activity.AdminEmployeeListActivity" />
         <activity android:name=".activity.EmployeeDetailActivity" />
         <activity android:name=".activity.MonitorActivity" />
         <activity android:name=".activity.MonitorListActivity" />
         <activity android:name=".activity.ApplyListActivity" />
         <activity android:name=".activity.ReviewApplyActivity" />
+        <activity android:name=".activity.AdminCarListActivity" />
+        <activity android:name=".activity.ReviewCarActivity" />
+        <activity android:name=".activity.AdminListActivity" />
 
         <service android:name="com.amap.api.track.AMapTrackService" />
         <service android:name="com.amap.api.location.APSService" />

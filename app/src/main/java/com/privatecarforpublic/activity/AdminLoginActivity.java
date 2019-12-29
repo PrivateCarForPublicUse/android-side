@@ -11,6 +11,7 @@ import com.jaeger.library.StatusBarUtil;
 import com.privatecarforpublic.MainActivity;
 import com.privatecarforpublic.R;
 import com.privatecarforpublic.application.MyApplication;
+import com.privatecarforpublic.model.Account;
 import com.privatecarforpublic.model.Master;
 import com.privatecarforpublic.response.ResponseResult;
 import com.privatecarforpublic.util.CommonUtil;
@@ -19,6 +20,8 @@ import com.privatecarforpublic.util.HttpRequestMethod;
 import com.privatecarforpublic.util.JsonUtil;
 import com.privatecarforpublic.util.SharePreferenceUtil;
 import com.xiasuhuei321.loadingdialog.view.LoadingDialog;
+
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -58,13 +61,15 @@ public class AdminLoginActivity extends Activity {
                     Map<String, Object> param=new HashMap<>();
                     param.put("masterName",account.getText().toString());
                     param.put("password",password.getText().toString());
-                    ResponseResult responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpPost, null, Constants.SERVICE_ROOT+"Master/login", param);
+                    ResponseResult responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpPost, null, Constants.SERVICE_ROOT+"authorize/login/masterName", param);
                     if(responseResult.getCode()!=200){
                         CommonUtil.showMessage(AdminLoginActivity.this,"账号或密码错误");
                         return;
                     }
-                    Master master = gson.fromJson(responseResult.getData(), Master.class);
-                    //SharePreferenceUtil.setString(AdminLoginActivity.this, "token", account.getToken());
+                    JSONObject jsonObject = new JSONObject(responseResult.getData());
+                    Master master = gson.fromJson(jsonObject.getString("userOrMaster"), Master.class);
+                    Account account = gson.fromJson(jsonObject.getString("account"), Account.class);
+                    SharePreferenceUtil.setString(AdminLoginActivity.this, "token", account.getToken());
                     SharePreferenceUtil.setString(AdminLoginActivity.this, "masterId", master.getId() + "");
                     Intent intent = new Intent(AdminLoginActivity.this, AdminHomeActivity.class);
                     intent.putExtra("master",master);

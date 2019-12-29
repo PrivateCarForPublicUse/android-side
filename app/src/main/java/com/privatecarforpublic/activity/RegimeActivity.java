@@ -178,6 +178,8 @@ public class RegimeActivity extends Activity {
         } else if (requestCode == TO_SHOW_CARS && resultCode == Activity.RESULT_OK) {
             Intent intent = new Intent();
             intent.putExtra("routeId",data.getLongExtra("routeId",-1));
+            intent.putExtra("firstPoint",data.getSerializableExtra("firstPoint"));
+            intent.putExtra("secondPoint",data.getSerializableExtra("secondPoint"));
             setResult(Activity.RESULT_OK, intent);
             finish();   //finish应该写到这个地方
         }

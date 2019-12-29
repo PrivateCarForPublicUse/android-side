@@ -70,7 +70,7 @@ public class LoginActivity extends Activity {
                         return;
                     }
                     JSONObject jsonObject = new JSONObject(responseResult.getData());
-                    User user = gson.fromJson(jsonObject.getString("user"), User.class);
+                    User user = gson.fromJson(jsonObject.getString("userOrMaster"), User.class);
                     Account account = gson.fromJson(jsonObject.getString("account"), Account.class);
                     SharePreferenceUtil.setString(LoginActivity.this, "token", account.getToken());
                     SharePreferenceUtil.setString(LoginActivity.this, "userId", user.getId() + "");

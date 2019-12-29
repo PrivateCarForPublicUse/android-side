@@ -108,6 +108,8 @@ public class SelectCarDetailActivity extends Activity {
                         Route route = gson.fromJson(responseResult.getData(), Route.class);
                         Intent intent = new Intent();
                         intent.putExtra("routeId",route.getId());
+                        intent.putExtra("firstPoint",pointList.get(0));
+                        intent.putExtra("secondPoint",pointList.get(1));
                         setResult(Activity.RESULT_OK, intent);
                         finish();
                     }
