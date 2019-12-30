@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.Gravity;
 import android.support.design.widget.NavigationView;
@@ -56,37 +58,70 @@ import com.amap.api.track.query.model.ParamErrorResponse;
 import com.amap.api.track.query.model.QueryTerminalRequest;
 import com.amap.api.track.query.model.QueryTerminalResponse;
 import com.amap.api.track.query.model.QueryTrackResponse;
+import com.google.gson.Gson;
 import com.jaeger.library.StatusBarUtil;
 import com.privatecarforpublic.activity.MyCarsActivity;
 import com.privatecarforpublic.activity.MyTravelsActivity;
 import com.privatecarforpublic.activity.RegimeActivity;
 import com.privatecarforpublic.activity.ReimbursementActivity;
 import com.privatecarforpublic.activity.RemainingSegmentActivity;
+import com.privatecarforpublic.activity.SelectCarActivity;
+import com.privatecarforpublic.model.PointLatDTO;
+import com.privatecarforpublic.model.Route;
+import com.privatecarforpublic.model.RouteModel;
+import com.privatecarforpublic.model.SecRouteModel;
 import com.privatecarforpublic.model.User;
+import com.privatecarforpublic.response.PollingResult;
+import com.privatecarforpublic.response.ResponseResult;
 import com.privatecarforpublic.util.CommonUtil;
 import com.privatecarforpublic.util.Constants;
+import com.privatecarforpublic.util.HttpRequestMethod;
+import com.privatecarforpublic.util.IGetRequest;
+import com.privatecarforpublic.util.JsonUtil;
+import com.privatecarforpublic.util.SharePreferenceUtil;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.amap.api.services.route.RouteSearch.DRIVING_SINGLE_SHORTEST;
 
 public class MainActivity extends Activity
         implements NavigationView.OnNavigationItemSelectedListener {
+    public final static String TAG="MainActivity";
     public final static int TO_REGIME=201;
     public final static int TO_CHOOSE_SEGMENT=202;
 
     private float plannedDistance;
     private double actualDistance;
     private User user;
-    private String terminalName="test";
+    private String terminalName;
     private Long terminalId=(long)-1;
     private Long trackId=(long)-1;
+    private long startTime;
+    private long endTime;
+    //轮询结果
+    private PollingResult recordResult;
+    private int status=-100;
+
     private AMapLocationClient mLocationClient = null;
     //声明AMapLocationClientOption对象
     public AMapLocationClientOption mLocationOption = null;
@@ -127,11 +162,8 @@ public class MainActivity extends Activity
 
     @OnClick(R.id.start)
     void startJourney(){
-        start.setVisibility(View.INVISIBLE);
-        cancel.setVisibility(View.INVISIBLE);
-        finish.setVisibility(View.VISIBLE);
+        startTime=System.currentTimeMillis();
         initTrack();
-        locate();
     }
 
     @OnClick(R.id.cancel)
@@ -144,16 +176,12 @@ public class MainActivity extends Activity
 
     @OnClick(R.id.finish)
     void finishJourney(){
-        finish.setText("行程已结束");
-        TrackParam trackParam = new TrackParam(Long.parseLong(Constants.SERVICE_ID), terminalId);
-        trackParam.setTrackId(trackId);
-        aMapTrackClient.stopTrack(trackParam, onTrackLifecycleListener);
-        long curr = System.currentTimeMillis();
+        endTime = System.currentTimeMillis();
         DistanceRequest distanceRequest = new DistanceRequest(
                 Long.parseLong(Constants.SERVICE_ID),
                 terminalId,
-                curr - 12 * 60 * 60 * 1000, // 开始时间
-                curr,   // 结束时间
+                startTime, // 开始时间
+                endTime,   // 结束时间
                 -1  // 轨迹id，传-1表示包含散点在内的所有轨迹点
         );
         aMapTrackClient.queryDistance(distanceRequest,onTrackListener);
@@ -178,6 +206,7 @@ public class MainActivity extends Activity
     private void init(){
         ButterKnife.bind(this);
         user=(User)getIntent().getSerializableExtra("user");
+        terminalName=user.getPhoneNumber();
         View headView=navigationView.getHeaderView(0);
         ImageView head_image=headView.findViewById(R.id.head_image);
         TextView username=headView.findViewById(R.id.username);
@@ -254,11 +283,76 @@ public class MainActivity extends Activity
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == TO_REGIME && resultCode == Activity.RESULT_OK) {
             start.setVisibility(View.VISIBLE);
+            start.setText("等待审核中...");
+            start.setClickable(false);
             cancel.setVisibility(View.VISIBLE);
             destination.setVisibility(View.INVISIBLE);
+
+            PointLatDTO firstPoint=(PointLatDTO)data.getSerializableExtra("firstPoint");
+            startPoint=new LatLonPoint(Double.parseDouble(firstPoint.getLatitude()),Double.parseDouble(firstPoint.getLongitude()));
+            PointLatDTO secondPoint=(PointLatDTO)data.getSerializableExtra("secondPoint");
+            endPoint=new LatLonPoint(Double.parseDouble(secondPoint.getLatitude()),Double.parseDouble(secondPoint.getLongitude()));
+
+            polling(data.getLongExtra("routeId",-1));
         }else if (requestCode == TO_CHOOSE_SEGMENT && resultCode == Activity.RESULT_OK) {
              CommonUtil.showMessage(this,"开始段行程");
         }
+
+    }
+
+    private void updateStarted(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Map<String, Object> param=new HashMap<>();
+                    RouteModel routeModel=recordResult.getData();
+                    param.put("routeId",routeModel.getRoute().getId());
+                    param.put("secRouteId",routeModel.getSecRoutes().get(0).getSecRoute().getId());
+                    param.put("tid",terminalId);
+                    param.put("trid",trackId);
+                    ResponseResult responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpPost, SharePreferenceUtil.getString(MainActivity.this, "token", ""), Constants.SERVICE_ROOT+"Route/start", param);
+                    if(responseResult.getCode()!=200){
+                        CommonUtil.showMessage(MainActivity.this,"开始行程失败");
+                        handler.sendEmptyMessage(4);
+                        return;
+                    }
+                    handler.sendEmptyMessage(3);
+                } catch (Exception e) {
+                    handler.sendEmptyMessage(4);
+                    CommonUtil.showMessage(MainActivity.this,"开始行程出错");
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+    }
+
+    private void updateEnded(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Map<String, Object> param=new HashMap<>();
+                    RouteModel routeModel=recordResult.getData();
+                    param.put("routeId",routeModel.getRoute().getId());
+                    param.put("secRouteId",routeModel.getSecRoutes().get(0).getSecRoute().getId());
+                    param.put("actualDistance",actualDistance);
+                    param.put("plannedDistance",plannedDistance);
+                    ResponseResult responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpPost, SharePreferenceUtil.getString(MainActivity.this, "token", ""), Constants.SERVICE_ROOT+"Route/stop", param);
+                    if(responseResult.getCode()!=200){
+                        CommonUtil.showMessage(MainActivity.this,"结束行程失败");
+                        //handler.sendEmptyMessage(4);
+                        return;
+                    }
+                    handler.sendEmptyMessage(5);
+                } catch (Exception e) {
+                    //handler.sendEmptyMessage(4);
+                    CommonUtil.showMessage(MainActivity.this,"结束行程出错");
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 
     }
 
@@ -379,7 +473,7 @@ public class MainActivity extends Activity
                     judge(latLngList,latLng1);
                     Polyline polyline=map.getMap().addPolyline(new PolylineOptions().
                             addAll(latLngList).width(10).color(Color.argb(255, 1, 1, 1)));
-                    Log.e("AmapError","location Error, ErrCode:"
+                    Log.e(TAG,"记录点数："
                             + polyline.getPoints().size());
                 }else {
                     //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
@@ -477,6 +571,7 @@ public class MainActivity extends Activity
             if (distanceResponse.isSuccess()) {
                 actualDistance = distanceResponse.getDistance();
                 // 行驶里程查询成功，行驶了meters米
+                updateEnded();
             } else {
                 // 行驶里程查询失败
                 CommonUtil.showMessage(MainActivity.this,"实际里程查询失败");
@@ -506,6 +601,7 @@ public class MainActivity extends Activity
                 TrackParam trackParam = new TrackParam(Long.parseLong(Constants.SERVICE_ID), terminalId);
                 trackParam.setTrackId(trackId);
                 aMapTrackClient.startTrack(trackParam, onTrackLifecycleListener);
+                updateStarted();
             } else {
                 Toast.makeText(MainActivity.this, "网络请求失败，" + addTrackResponse.getErrorMsg(), Toast.LENGTH_SHORT).show();
             }
@@ -541,4 +637,135 @@ public class MainActivity extends Activity
 
         }
     };
+
+    private void polling(long routeId) {
+        // 步骤1：创建Retrofit对象
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Constants.SERVICE_ROOT) // 设置 网络请求 Url
+                .addConverterFactory(GsonConverterFactory.create()) //设置使用Gson解析(记得加入依赖)
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create()) // 支持RxJava
+                .build();
+
+        // 步骤2：创建 网络请求接口 的实例
+        IGetRequest request = retrofit.create(IGetRequest.class);
+
+        // 步骤3：采用Observable<...>形式 对 网络请求 进行封装
+        String token= SharePreferenceUtil.getString(MainActivity.this, "token", "");
+        Observable<PollingResult> observable = request.getRoute(token,routeId);
+        // 步骤4：发送网络请求 & 通过repeatWhen（）进行轮询
+        observable.repeatWhen(new Function<Observable<Object>, ObservableSource<?>>() {
+            @Override
+            // 在Function函数中，必须对输入的 Observable<Object>进行处理，此处使用flatMap操作符接收上游的数据
+            public ObservableSource<?> apply(@NonNull Observable<Object> objectObservable) throws Exception {
+                // 将原始 Observable 停止发送事件的标识（Complete（） /  Error（））转换成1个 Object 类型数据传递给1个新被观察者（Observable）
+                // 以此决定是否重新订阅 & 发送原来的 Observable，即轮询
+                // 此处有2种情况：
+                // 1. 若返回1个Complete（） /  Error（）事件，则不重新订阅 & 发送原来的 Observable，即轮询结束
+                // 2. 若返回其余事件，则重新订阅 & 发送原来的 Observable，即继续轮询
+                return objectObservable.flatMap(new Function<Object, ObservableSource<?>>() {
+                    @Override
+                    public ObservableSource<?> apply(@NonNull Object throwable) throws Exception {
+
+                        // 加入判断条件：当申请状态发生改变后结束
+                        try{
+                            if (status!=0) {
+                                // 此处选择发送onError事件以结束轮询，因为可触发下游观察者的onError（）方法回调
+                                if(status==1){
+                                    handler.sendEmptyMessage(1);
+                                }else if(status==-100){
+                                    return Observable.just(1).delay(2000, TimeUnit.MILLISECONDS);
+                                }else{
+                                    handler.sendEmptyMessage(2);
+                                }
+                                return Observable.error(new Throwable("轮询结束"));
+                            }
+                            // 还未审核，则继续轮询
+                            // 注：此处加入了delay操作符，作用 = 延迟一段时间发送（此处设置 = 2s），以实现轮询间间隔设置
+                            return Observable.just(1).delay(2000, TimeUnit.MILLISECONDS);
+                        }catch (Exception e){
+                            Log.e(TAG, e.toString());
+                            return Observable.error(new Throwable("轮询出错"));
+                        }
+                    }
+                });
+
+            }
+        }).subscribeOn(Schedulers.io())               // 切换到IO线程进行网络请求
+                .observeOn(AndroidSchedulers.mainThread())  // 切换回到主线程 处理请求结果
+                .subscribe(new Observer<PollingResult>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                    }
+
+                    @Override
+                    public void onNext(PollingResult result) {
+                        // e.接收服务器返回的数据
+                        recordResult=result;
+                        Route route= result.getData().getRoute();
+                        status=route.getStatus();
+                        Log.e(TAG,"请求次数+1");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        // 获取轮询结束信息
+                        Log.e(TAG, e.toString());
+                    }
+
+                    @Override
+                    public void onComplete() {
+                    }
+                });
+    }
+
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == 1) {
+                changeToStart();
+            }else if(msg.what==2){
+                changeToCancle();
+            }else if(msg.what==3){
+                changeToStarted();
+            }else if(msg.what==4){
+                changeToCanceled();
+            }else if(msg.what==5){
+                changeToEnded();
+            }
+
+        }
+    };
+
+    private void changeToStart(){
+        start.setClickable(true);
+        start.setText("开始行程");
+    }
+
+    private void changeToCancle(){
+        start.setVisibility(View.INVISIBLE);
+        cancel.setVisibility(View.INVISIBLE);
+        destination.setVisibility(View.VISIBLE);
+        CommonUtil.showMessage(MainActivity.this,"申请已被拒绝");
+    }
+
+    private void changeToStarted(){
+        start.setVisibility(View.INVISIBLE);
+        cancel.setVisibility(View.INVISIBLE);
+        finish.setVisibility(View.VISIBLE);
+        locate();
+    }
+
+    private void changeToCanceled(){
+        TrackParam trackParam = new TrackParam(Long.parseLong(Constants.SERVICE_ID), terminalId);
+        trackParam.setTrackId(trackId);
+        aMapTrackClient.stopTrack(trackParam, onTrackLifecycleListener);
+    }
+
+    private void changeToEnded(){
+        finish.setText("行程已结束");
+        TrackParam trackParam = new TrackParam(Long.parseLong(Constants.SERVICE_ID), terminalId);
+        trackParam.setTrackId(trackId);
+        aMapTrackClient.stopTrack(trackParam, onTrackLifecycleListener);
+        mLocationClient.stopLocation();
+    }
 }

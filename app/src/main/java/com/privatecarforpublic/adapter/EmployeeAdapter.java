@@ -63,4 +63,9 @@ public class EmployeeAdapter extends BaseAdapter {
         private TextView employee_name;
         private TextView employee_star;
     }
+
+    public void updateView(List<User> list) {
+        this.mList = list;
+        this.notifyDataSetChanged();
+    }
 }

@@ -92,4 +92,9 @@ public class CarAdapter extends BaseAdapter{
         private TextView type;
         private TextView star;
     }
+
+    public void updateView(List<Car> list) {
+        this.mList = list;
+        this.notifyDataSetChanged();
+    }
 }

@@ -18,7 +18,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import butterknife.OnItemClick;
 
 public class AdminHomeActivity extends Activity {
@@ -45,6 +44,7 @@ public class AdminHomeActivity extends Activity {
     private void init() {
         functionList = new ArrayList<>();
         functionList.add(new Function(R.drawable.star, "员工审核"));
+        functionList.add(new Function(R.drawable.star, "用车审核"));
         functionList.add(new Function(R.drawable.star, "车辆审核"));
         functionList.add(new Function(R.drawable.star, "报销审核"));
         functionList.add(new Function(R.drawable.star, "用车记录"));
@@ -60,12 +60,36 @@ public class AdminHomeActivity extends Activity {
     public void onPrivateItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         switch (i) {
             case (0):
-                Intent intent = new Intent(AdminHomeActivity.this, ReviewEmployeeActivity.class);
+                Intent intent = new Intent(AdminHomeActivity.this, AdminEmployeeListActivity.class);
+                intent.putExtra("type",1);
                 startActivity(intent);
                 break;
+            case (1):
+                Intent intent1 = new Intent(AdminHomeActivity.this, ApplyListActivity.class);
+                startActivity(intent1);
+                break;
+            case (2):
+                Intent intent2 = new Intent(AdminHomeActivity.this, AdminCarListActivity.class);
+                intent2.putExtra("type",1);
+                startActivity(intent2);
+                break;
+            case (5):
+                Intent intent5 = new Intent(AdminHomeActivity.this, AdminEmployeeListActivity.class);
+                intent5.putExtra("type",0);
+                startActivity(intent5);
+                break;
             case (6):
-                Intent intent6 = new Intent(AdminHomeActivity.this, MonitorListActivity.class);
+                Intent intent6 = new Intent(AdminHomeActivity.this, AdminListActivity.class);
                 startActivity(intent6);
+                break;
+            case (7):
+                Intent intent7 = new Intent(AdminHomeActivity.this, MonitorListActivity.class);
+                startActivity(intent7);
+                break;
+            case (8):
+                Intent intent8 = new Intent(AdminHomeActivity.this, AdminCarListActivity.class);
+                intent8.putExtra("type",0);
+                startActivity(intent8);
                 break;
             default:
                 break;

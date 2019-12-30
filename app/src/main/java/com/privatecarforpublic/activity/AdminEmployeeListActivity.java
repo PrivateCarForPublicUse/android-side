@@ -21,8 +21,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnItemClick;
 
-public class ReviewEmployeeActivity extends Activity {
-    private static final String TAG = "ReviewEmployeeActivity";
+public class AdminEmployeeListActivity extends Activity {
+    private static final String TAG = "AdminEmployeeListActivity";
     public final static int TO_REVIEW_EMPLOYEE = 104;
 
     @BindView(R.id.employee_list)
@@ -32,6 +32,7 @@ public class ReviewEmployeeActivity extends Activity {
     @BindView(R.id.side)
     TextView side;
 
+    private int type;
     private List<User> employeeList;
     private EmployeeAdapter employeeAdapter;
 
@@ -40,11 +41,16 @@ public class ReviewEmployeeActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.employee_review);
         ButterKnife.bind(this);
-        title.setText("员工审核");
+        type=getIntent().getIntExtra("type",-1);
+        if(type==0){
+            title.setText("员工管理");
+        }else{
+            title.setText("员工审核");
+        }
         side.setVisibility(View.INVISIBLE);
         init();
         //状态栏颜色设置
-        StatusBarUtil.setColor(ReviewEmployeeActivity.this, 25);
+        StatusBarUtil.setColor(AdminEmployeeListActivity.this, 25);
     }
 
     private void init() {
@@ -58,8 +64,9 @@ public class ReviewEmployeeActivity extends Activity {
 
     @OnItemClick(R.id.employee_list)
     public void onPrivateItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Intent intent=new Intent(ReviewEmployeeActivity.this,EmployeeDetailActivity.class);
-        intent.putExtra("car",employeeList.get(i));
+        Intent intent=new Intent(AdminEmployeeListActivity.this,EmployeeDetailActivity.class);
+        intent.putExtra("user",employeeList.get(i));
+        intent.putExtra("index",i);
         startActivityForResult(intent,TO_REVIEW_EMPLOYEE);
     }
 
@@ -72,9 +79,11 @@ public class ReviewEmployeeActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == TO_REVIEW_EMPLOYEE && resultCode == Activity.RESULT_OK) {
-            Intent intent = new Intent();
-            setResult(Activity.RESULT_OK, intent);
-            finish();   //finish应该写到这个地方
+            int index=data.getIntExtra("index",-1);
+            if(index!=-1){
+                employeeList.remove(index);
+                employeeAdapter.updateView(employeeList);
+            }
         }
     }
 }

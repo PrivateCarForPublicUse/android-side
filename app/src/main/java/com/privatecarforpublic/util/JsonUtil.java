@@ -27,9 +27,10 @@ public class JsonUtil {
         Request request = null;
         RequestBody body;
         String json = gson.toJson(entity);
+        String cookie="token=\""+token+"\"";
         switch (requestMethod) {
             case HttpGet:
-                request = new Request.Builder().url(url).addHeader("token",token).get().build();
+                request = new Request.Builder().url(url).addHeader("Cookie",cookie).get().build();
                 break;
             case HttpPost:
                 body = RequestBody.create(JSON, json);
@@ -37,14 +38,14 @@ public class JsonUtil {
                 if(token==null)
                     request = new Request.Builder().url(url).post(body).build();
                 else
-                    request = new Request.Builder().url(url).addHeader("token",token).post(body).build();
+                    request = new Request.Builder().url(url).addHeader("Cookie",cookie).post(body).build();
                 break;
             case HttpPut:
                 body = RequestBody.create(JSON, json);
-                request = new Request.Builder().url(url).addHeader("token",token).put(body).build();
+                request = new Request.Builder().url(url).addHeader("Cookie",cookie).put(body).build();
                 break;
             case HttpDelete:
-                request = new Request.Builder().url(url).addHeader("token",token).delete().build();
+                request = new Request.Builder().url(url).addHeader("Cookie",cookie).delete().build();
                 break;
         }
         try {

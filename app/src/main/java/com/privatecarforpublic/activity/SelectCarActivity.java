@@ -54,7 +54,6 @@ public class SelectCarActivity extends Activity {
     private CarAdapter privateCarAdapter;
     private CarAdapter publicCarAdapter;
 
-    private User user;
     private Date start;
     private Date end;
     private String reason;
@@ -77,6 +76,9 @@ public class SelectCarActivity extends Activity {
         SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
         start = (Date) getIntent().getSerializableExtra("startTime");
         end = (Date) getIntent().getSerializableExtra("endTime");
+        reason=getIntent().getStringExtra("reason");
+        pointList=(List<PointLatDTO>) getIntent().getSerializableExtra("pointList");
+        nameList=(List<String>) getIntent().getSerializableExtra("nameList");
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -130,19 +132,24 @@ public class SelectCarActivity extends Activity {
         SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
         Intent intent = new Intent(SelectCarActivity.this, SelectCarDetailActivity.class);
         intent.putExtra("car", privateCarList.get(i));
-        intent.putExtra("startTime",sdf.format((Date) getIntent().getSerializableExtra("startTime")));
-        intent.putExtra("endTime",sdf.format((Date) getIntent().getSerializableExtra("endTime")));
-        intent.putExtra("user",getIntent().getSerializableExtra("user"));
-        intent.putExtra("reason",getIntent().getStringExtra("reason"));
-        intent.putExtra("pointList",getIntent().getSerializableExtra("pointList"));
-        intent.putExtra("nameList",getIntent().getSerializableExtra("nameList"));
+        intent.putExtra("startTime",sdf.format(start));
+        intent.putExtra("endTime",sdf.format(end));
+        intent.putExtra("reason",reason);
+        intent.putExtra("pointList",(Serializable)pointList);
+        intent.putExtra("nameList",(Serializable)nameList);
         startActivityForResult(intent, TO_SELECT_CAR);
     }
 
     @OnItemClick(R.id.public_car_list)
     public void onPublicItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
         Intent intent = new Intent(SelectCarActivity.this, SelectCarDetailActivity.class);
         intent.putExtra("car", publicCarList.get(i));
+        intent.putExtra("startTime",sdf.format(start));
+        intent.putExtra("endTime",sdf.format(end));
+        intent.putExtra("reason",reason);
+        intent.putExtra("pointList",(Serializable)pointList);
+        intent.putExtra("nameList",(Serializable)nameList);
         startActivityForResult(intent, TO_SELECT_CAR);
     }
 
@@ -156,6 +163,9 @@ public class SelectCarActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == TO_SELECT_CAR && resultCode == Activity.RESULT_OK) {
             Intent intent = new Intent();
+            intent.putExtra("routeId",data.getLongExtra("routeId",-1));
+            intent.putExtra("firstPoint",data.getSerializableExtra("firstPoint"));
+            intent.putExtra("secondPoint",data.getSerializableExtra("secondPoint"));
             setResult(Activity.RESULT_OK, intent);
             finish();   //finish应该写到这个地方
         }

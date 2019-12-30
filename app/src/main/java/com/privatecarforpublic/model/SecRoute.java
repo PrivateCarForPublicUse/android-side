@@ -1,5 +1,7 @@
 package com.privatecarforpublic.model;
 
+import java.io.Serializable;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -7,9 +9,9 @@ import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 @Builder
-public class SecRoute {
+@NoArgsConstructor
+public class SecRoute implements Serializable {
     private Long id;
     //行程表id
     private Long routeId;
@@ -25,4 +27,5 @@ public class SecRoute {
     private String desLongitude;
     //目的地纬度
     private String desLatitude;
+
 }

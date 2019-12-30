@@ -11,4 +11,5 @@ public class Account {
     private Long id;
     private String password;
     private String token;
+    private Integer flag;//1:管理员 0：用户
 }
