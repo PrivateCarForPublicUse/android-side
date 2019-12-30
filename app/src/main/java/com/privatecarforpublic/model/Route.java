@@ -23,4 +23,6 @@ public class Route implements Serializable {
     private int status;
     //申请理由
     private String reason;
+    //-1 报销失败；0 未报销；1 已报销；2 审核中
+    private int isReimburse;
 }

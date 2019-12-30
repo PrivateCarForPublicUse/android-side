@@ -15,6 +15,10 @@ import com.google.gson.reflect.TypeToken;
 import com.privatecarforpublic.R;
 import com.privatecarforpublic.adapter.MyTravelsAdapter;
 import com.privatecarforpublic.model.MyTravels;
+import com.privatecarforpublic.model.MyTravelsUtil;
+import com.privatecarforpublic.model.RouteModel;
+import com.privatecarforpublic.model.SecRoute;
+import com.privatecarforpublic.model.SecRouteModel;
 import com.privatecarforpublic.model.User;
 import com.privatecarforpublic.response.ResponseResult;
 import com.privatecarforpublic.util.CommonUtil;
@@ -43,7 +47,8 @@ import lombok.Builder;
  * @description 我的行程列表界面
  */
 public class MyTravelsActivity extends Activity {
-    private List<MyTravels> myTravelsList = new ArrayList<>();
+    private List<RouteModel> myTravelsList = new ArrayList<>();
+    private List<MyTravelsUtil> list = new ArrayList<>();
     private String userId = null;
     @BindView(R.id.title)
     TextView title;
@@ -71,11 +76,11 @@ public class MyTravelsActivity extends Activity {
         side.setText("报销");
 
         init();
-        MyTravelsAdapter adapter = new MyTravelsAdapter(MyTravelsActivity.this, R.layout.my_travel_item, myTravelsList);
+        MyTravelsAdapter adapter = new MyTravelsAdapter(MyTravelsActivity.this, R.layout.my_travel_item, list);
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(((parent, view, position, id) -> {
-            MyTravels myTravels = myTravelsList.get(position);
+            MyTravelsUtil myTravels = list.get(position);
             CommonUtil.showMessage(MyTravelsActivity.this, "您点击的是第" + (position + 1) + "个");
         }));
 
@@ -96,23 +101,26 @@ public class MyTravelsActivity extends Activity {
     }
 
     private void init() {
-        for (int i = 0; i < 24; ++i) {
+        /*for (int i = 0; i < 24; ++i) {
             MyTravels myTravels = new MyTravels().builder().carStartTime(new Date().toString()).origin("始   " + "浙江大学宁波软院")
                     .destination("终   " + "浙江大学宁波软院").status(1).isReimburse(0).build();
             myTravelsList.add(myTravels);
-        }
-        /*Thread thread = new Thread(()->{
+        }*/
+        Thread thread = new Thread(()->{
             try{
                 Gson gson = new Gson();
                 userId = SharePreferenceUtil.getString(MyTravelsActivity.this,"userId","");
+                System.out.println(userId);
+                /*ResponseResult responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpGet, SharePreferenceUtil
+                        .getString(MyTravelsActivity.this, "token", ""), Constants.SERVICE_ROOT + "/Route/userId?userId=" + userId, null);*/
                 ResponseResult responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpGet, SharePreferenceUtil
-                        .getString(MyTravelsActivity.this, "token", ""), Constants.SERVICE_ROOT + "car/Route/userId?userId=" + userId, null);
+                        .getString(MyTravelsActivity.this, "token", ""), Constants.SERVICE_ROOT + "/Route/fd", null);
                 if(responseResult.getCode() != 200){
                     CommonUtil.showMessage(MyTravelsActivity.this,"无相应的出行路程！");
                     myTravelsList.clear();
                 }else{
-                    myTravelsList = gson.fromJson(responseResult.getData(),new TypeToken<List<MyTravels>>(){
-                    }.getType());
+                    myTravelsList = gson.fromJson(responseResult.getData(),new TypeToken<List<RouteModel>>(){}.getType());
+                    System.out.println(myTravelsList);
                 }
             }catch (Exception e){
                 e.printStackTrace();
@@ -123,6 +131,24 @@ public class MyTravelsActivity extends Activity {
             thread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }*/
+        }
+
+        /**
+         *  TODO   这里的getSecRoutesModel  为null
+         *  TODO  而且速度也很慢
+         */
+        for(RouteModel routeModel : myTravelsList){
+            if(null == routeModel || null ==routeModel.getSecRoutes())
+                continue;
+            for(SecRouteModel secRouteModel : routeModel.getSecRoutes()){
+                if(null == secRouteModel)
+                    break;
+                list.add(new MyTravelsUtil().builder().carStartTime(null == secRouteModel.getSettlement() ? "默认出发时间" : secRouteModel.getSettlement().getCarStartTime())
+                        .origin(null == secRouteModel.getSecRoute() ? "默认出发地点" :secRouteModel.getSecRoute().getOrigin())
+                        .destination(null == secRouteModel.getSecRoute() ? "默认终止地点" :secRouteModel.getSecRoute().getDestination())
+                        .isReimburse(null == routeModel.getRoute() ?  0 : routeModel.getRoute().getIsReimburse())
+                        .status(null == routeModel.getRoute() ? 0 : routeModel.getRoute().getStatus()).build());
+            }
+        }
     }
 }

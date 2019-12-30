@@ -11,24 +11,28 @@ import android.widget.TextView;
 
 import com.privatecarforpublic.R;
 import com.privatecarforpublic.model.MyTravels;
+import com.privatecarforpublic.model.MyTravelsUtil;
+import com.privatecarforpublic.model.RouteModel;
+
 import java.util.List;
 
 /**
  * @date:2019/12/16
  * @author:zhongcz
  */
-public class MyTravelsAdapter extends ArrayAdapter<MyTravels> {
+public class MyTravelsAdapter extends ArrayAdapter<MyTravelsUtil> {
     private int resourceId;
 
-    public MyTravelsAdapter(@NonNull Context context, int resource, @NonNull List<MyTravels> objects) {
+    public MyTravelsAdapter(@NonNull Context context, int resource, @NonNull List<MyTravelsUtil> objects) {
         super(context, resource, objects);
         this.resourceId = resource;
     }
 
+
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        MyTravels myTravels = getItem(position);
+        MyTravelsUtil myTravels = getItem(position);
 
         View view;
         ViewHolder viewHolder;
@@ -45,7 +49,7 @@ public class MyTravelsAdapter extends ArrayAdapter<MyTravels> {
             viewHolder = (ViewHolder) view.getTag();
         }
 
-        viewHolder.date.setText(myTravels.getCarStartTime().toString());
+        viewHolder.date.setText(myTravels.getCarStartTime());
         viewHolder.start.setText(myTravels.getOrigin());
         viewHolder.end.setText(myTravels.getDestination());
         return view;
