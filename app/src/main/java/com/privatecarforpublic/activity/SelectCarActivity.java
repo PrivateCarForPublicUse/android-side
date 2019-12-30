@@ -14,6 +14,7 @@ import com.jaeger.library.StatusBarUtil;
 import com.privatecarforpublic.R;
 import com.privatecarforpublic.adapter.CarAdapter;
 import com.privatecarforpublic.model.Car;
+import com.privatecarforpublic.model.CarModel;
 import com.privatecarforpublic.model.PointLatDTO;
 import com.privatecarforpublic.model.User;
 import com.privatecarforpublic.response.ResponseResult;
@@ -51,6 +52,8 @@ public class SelectCarActivity extends Activity {
 
     private List<Car> privateCarList;
     private List<Car> publicCarList;
+    private List<User> privateUserList;
+    private List<User> publicUserList;
     private CarAdapter privateCarAdapter;
     private CarAdapter publicCarAdapter;
 
@@ -85,6 +88,8 @@ public class SelectCarActivity extends Activity {
                 try {
                     //公有车列表
                     Gson gson = new Gson();
+                    publicCarList=new ArrayList<>();
+                    publicUserList=new ArrayList<>();
                     Map<String, Object> param = new HashMap<>();
                     param.put("startTime", sdf.format(start));
                     param.put("endTime", sdf.format(end));
@@ -92,21 +97,29 @@ public class SelectCarActivity extends Activity {
                     ResponseResult responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpPost, SharePreferenceUtil.getString(SelectCarActivity.this, "token", ""), Constants.SERVICE_ROOT + "car/getCarByTime", param);
                     if (responseResult.getCode() != 200) {
                         CommonUtil.showMessage(SelectCarActivity.this, "无可用公车");
-                        publicCarList=new ArrayList<>();
                     } else{
-                        publicCarList = gson.fromJson(responseResult.getData(), new TypeToken<List<Car>>() {
+                        List<CarModel> carModels=gson.fromJson(responseResult.getData(), new TypeToken<List<CarModel>>() {
                         }.getType());
+                        for(CarModel carModel:carModels){
+                            publicCarList.add(carModel.getCar());
+                            publicUserList.add(carModel.getUser());
+                        }
                     }
 
+                    privateCarList = new ArrayList<>();
+                    privateUserList=new ArrayList<>();
                     //私有车列表
                     param.put("isMine", 1);
                     responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpPost, SharePreferenceUtil.getString(SelectCarActivity.this, "token", ""), Constants.SERVICE_ROOT + "car/getCarByTime", param);
                     if (responseResult.getCode() != 200) {
                         CommonUtil.showMessage(SelectCarActivity.this, "无可用私车");
-                        privateCarList = new ArrayList<>();
                     }else{
-                        privateCarList = gson.fromJson(responseResult.getData(), new TypeToken<List<Car>>() {
+                        List<CarModel> carModels=gson.fromJson(responseResult.getData(), new TypeToken<List<CarModel>>() {
                         }.getType());
+                        for(CarModel carModel:carModels){
+                            privateCarList.add(carModel.getCar());
+                            privateUserList.add(carModel.getUser());
+                        }
                     }
                 } catch (Exception e) {
                     CommonUtil.showMessage(SelectCarActivity.this, "查询可用车辆失败");
@@ -132,6 +145,7 @@ public class SelectCarActivity extends Activity {
         SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
         Intent intent = new Intent(SelectCarActivity.this, SelectCarDetailActivity.class);
         intent.putExtra("car", privateCarList.get(i));
+        intent.putExtra("user",privateUserList.get(i));
         intent.putExtra("startTime",sdf.format(start));
         intent.putExtra("endTime",sdf.format(end));
         intent.putExtra("reason",reason);
@@ -145,6 +159,7 @@ public class SelectCarActivity extends Activity {
         SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
         Intent intent = new Intent(SelectCarActivity.this, SelectCarDetailActivity.class);
         intent.putExtra("car", publicCarList.get(i));
+        intent.putExtra("user",publicUserList.get(i));
         intent.putExtra("startTime",sdf.format(start));
         intent.putExtra("endTime",sdf.format(end));
         intent.putExtra("reason",reason);

@@ -69,6 +69,7 @@ import com.privatecarforpublic.activity.SelectCarActivity;
 import com.privatecarforpublic.model.PointLatDTO;
 import com.privatecarforpublic.model.Route;
 import com.privatecarforpublic.model.RouteModel;
+import com.privatecarforpublic.model.SecRoute;
 import com.privatecarforpublic.model.SecRouteModel;
 import com.privatecarforpublic.model.User;
 import com.privatecarforpublic.response.PollingResult;
@@ -130,6 +131,7 @@ public class MainActivity extends Activity
     private List<LatLng> latLngList=new ArrayList<>();
     private LatLonPoint startPoint;
     private LatLonPoint endPoint;
+    private long secRouteId;
 
     @BindView(R.id.destination)
     TextView destination;
@@ -258,6 +260,7 @@ public class MainActivity extends Activity
             // Handle the camera action
         } else if (id == R.id.remaining_segment) {
             Intent intent = new Intent(MainActivity.this, RemainingSegmentActivity.class);
+            intent.putExtra("routeId",recordResult.getData().getRoute().getId());
             startActivityForResult(intent,TO_CHOOSE_SEGMENT);
 
         } else if (id == R.id.reply_reimbursement) {
@@ -296,6 +299,13 @@ public class MainActivity extends Activity
             polling(data.getLongExtra("routeId",-1));
         }else if (requestCode == TO_CHOOSE_SEGMENT && resultCode == Activity.RESULT_OK) {
              CommonUtil.showMessage(this,"开始段行程");
+             SecRoute secRoute=(SecRoute) data.getSerializableExtra("secRoute");
+             startPoint.setLatitude(Double.parseDouble(secRoute.getOriLatitude()));
+             startPoint.setLongitude(Double.parseDouble(secRoute.getOriLongitude()));
+             endPoint.setLatitude(Double.parseDouble(secRoute.getDesLatitude()));
+             endPoint.setLongitude(Double.parseDouble(secRoute.getDesLongitude()));
+             secRouteId=secRoute.getId();
+             updateStarted();
         }
 
     }
@@ -308,7 +318,7 @@ public class MainActivity extends Activity
                     Map<String, Object> param=new HashMap<>();
                     RouteModel routeModel=recordResult.getData();
                     param.put("routeId",routeModel.getRoute().getId());
-                    param.put("secRouteId",routeModel.getSecRoutes().get(0).getSecRoute().getId());
+                    param.put("secRouteId",secRouteId);
                     param.put("tid",terminalId);
                     param.put("trid",trackId);
                     ResponseResult responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpPost, SharePreferenceUtil.getString(MainActivity.this, "token", ""), Constants.SERVICE_ROOT+"Route/start", param);
@@ -336,7 +346,7 @@ public class MainActivity extends Activity
                     Map<String, Object> param=new HashMap<>();
                     RouteModel routeModel=recordResult.getData();
                     param.put("routeId",routeModel.getRoute().getId());
-                    param.put("secRouteId",routeModel.getSecRoutes().get(0).getSecRoute().getId());
+                    param.put("secRouteId",secRouteId);
                     param.put("actualDistance",actualDistance);
                     param.put("plannedDistance",plannedDistance);
                     ResponseResult responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpPost, SharePreferenceUtil.getString(MainActivity.this, "token", ""), Constants.SERVICE_ROOT+"Route/stop", param);
@@ -739,6 +749,7 @@ public class MainActivity extends Activity
     private void changeToStart(){
         start.setClickable(true);
         start.setText("开始行程");
+        secRouteId=recordResult.getData().getSecRoutesModel().get(0).getSecRoute().getId();
     }
 
     private void changeToCancle(){

@@ -16,6 +16,7 @@ import com.privatecarforpublic.model.ApplyCarDTO;
 import com.privatecarforpublic.model.Car;
 import com.privatecarforpublic.model.PointLatDTO;
 import com.privatecarforpublic.model.Route;
+import com.privatecarforpublic.model.User;
 import com.privatecarforpublic.response.ResponseResult;
 import com.privatecarforpublic.util.CommonUtil;
 import com.privatecarforpublic.util.Constants;
@@ -36,7 +37,7 @@ import butterknife.OnClick;
 
 public class SelectCarDetailActivity extends Activity {
     private static final String TAG = "SelectCarDetailActivity";
-    private Car car;
+
     @BindView(R.id.title)
     TextView title;
     @BindView(R.id.side)
@@ -58,6 +59,8 @@ public class SelectCarDetailActivity extends Activity {
     @BindView(R.id.commercialInsurancePolicy)
     TextView commercialInsurancePolicy;
 
+    private Car car;
+    private User user;
     private String start;
     private String end;
     private String reason;
@@ -84,10 +87,11 @@ public class SelectCarDetailActivity extends Activity {
         start = getIntent().getStringExtra("startTime");
         end = getIntent().getStringExtra("endTime");
         car=(Car)getIntent().getSerializableExtra("car");
+        user=(User)getIntent().getSerializableExtra("user");
         //Picasso.get().load(car.getPicture()).into(picture);
         license.setText(car.getLicense());
         brand_type.setText(car.getBrand()+"·"+car.getType());
-        owner.setText(car.getUserId()+"");
+        owner.setText(user.getName());
         starOfCar.setText(car.getStarOfCar()+"");
         insuranceCompany.setText(car.getInsuranceCompany());
     }

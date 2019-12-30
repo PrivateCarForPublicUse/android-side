@@ -78,7 +78,7 @@ public class ApplyListActivity extends Activity {
                         }.getType());
                         for(RouteModel routeModel:list){
                             List<SecRoute> secRouteList=new ArrayList<>();
-                            for(SecRouteModel secRouteModel:routeModel.getSecRoutes()){
+                            for(SecRouteModel secRouteModel:routeModel.getSecRoutesModel()){
                                 secRouteList.add(secRouteModel.getSecRoute());
                             }
                             Apply apply=new Apply(routeModel.getUser(),routeModel.getCar()

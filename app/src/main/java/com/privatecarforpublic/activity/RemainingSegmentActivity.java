@@ -13,10 +13,20 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.amap.api.services.help.Tip;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.jaeger.library.StatusBarUtil;
 import com.privatecarforpublic.R;
+import com.privatecarforpublic.adapter.RemainSecAdapter;
 import com.privatecarforpublic.adapter.SegmentAdapter;
+import com.privatecarforpublic.model.SecRoute;
 import com.privatecarforpublic.model.Segment;
+import com.privatecarforpublic.response.ResponseResult;
+import com.privatecarforpublic.util.CommonUtil;
+import com.privatecarforpublic.util.Constants;
+import com.privatecarforpublic.util.HttpRequestMethod;
+import com.privatecarforpublic.util.JsonUtil;
+import com.privatecarforpublic.util.SharePreferenceUtil;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,25 +41,28 @@ import butterknife.OnItemClick;
 public class RemainingSegmentActivity extends Activity {
     private static final String TAG = "RemainingSegmentActivity";
 
-    @BindView(R.id.seg_list)
-    ListView seg_list;
+    @BindView(R.id.remain_sec_list)
+    ListView remain_sec_list;
     @BindView(R.id.title)
     TextView title;
     @BindView(R.id.side)
     TextView side;
-    @BindView(R.id.time)
-    TextView time;
+    @BindView(R.id.start_time)
+    TextView start_time;
+    @BindView(R.id.end_time)
+    TextView end_time;
 
-    private List<Segment> segmentList;
-    private SegmentAdapter segmentAdapter;
+    private List<SecRoute> secRouteList;
+    private RemainSecAdapter remainSecAdapter;
     private String select_time;
+    private long routeId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.remaining_segment);
         ButterKnife.bind(this);
-        title.setText("行程分段");
+        title.setText("剩余段程");
         side.setVisibility(View.INVISIBLE);
         init();
         //状态栏颜色设置
@@ -57,10 +70,40 @@ public class RemainingSegmentActivity extends Activity {
     }
 
     private void init() {
-        segmentList = new ArrayList<>();
-        segmentList.add(newSegment());
-        segmentAdapter = new SegmentAdapter(this, RemainingSegmentActivity.this, segmentList);
-        seg_list.setAdapter(segmentAdapter);
+        routeId=getIntent().getLongExtra("routeId",-1);
+        if(routeId==-1){
+            CommonUtil.showMessage(RemainingSegmentActivity.this, "已无剩余段程");
+            return;
+        }
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Gson gson=new Gson();
+                    secRouteList=new ArrayList<>();
+                    String url= Constants.SERVICE_ROOT + "SecRoute/findRemainSec?routeId="+routeId;
+                    ResponseResult responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpGet, SharePreferenceUtil.getString(RemainingSegmentActivity.this, "token", ""), url, null);
+                    if (responseResult.getCode() !=200 ) {
+                        CommonUtil.showMessage(RemainingSegmentActivity.this, responseResult.getMessage());
+                    } else{
+                        secRouteList=gson.fromJson(responseResult.getData(), new TypeToken<List<SecRoute>>() {
+                        }.getType());
+                    }
+                } catch (Exception e) {
+                    CommonUtil.showMessage(RemainingSegmentActivity.this, "查询剩余段程出错");
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        remainSecAdapter= new RemainSecAdapter(this,secRouteList);
+        remain_sec_list.setAdapter(remainSecAdapter);
     }
 
     @OnClick(R.id.back)
@@ -68,19 +111,11 @@ public class RemainingSegmentActivity extends Activity {
         finish();
     }
 
-    private Segment newSegment() {
-        Tip departure = new Tip();
-        departure.setName("你想从哪出发？");
-        Tip destination = new Tip();
-        destination.setName("你想去哪里？");
-        return new Segment(departure, destination);
-    }
 
-    @OnItemClick(R.id.seg_list)
+    @OnItemClick(R.id.remain_sec_list)
     void onSegmentItemClick(AdapterView<?> adapterView, View view, int i, long l){
         Intent intent = new Intent();
-        intent.putExtra("departure",segmentList.get(i).getDeparture());
-        intent.putExtra("destination",segmentList.get(i).getDestination());
+        intent.putExtra("secRoute",secRouteList.get(i));
         setResult(Activity.RESULT_OK, intent);
         finish();   //finish应该写到这个地方
     }

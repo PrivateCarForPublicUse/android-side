@@ -138,9 +138,9 @@ public class MyTravelsActivity extends Activity {
          *  TODO  而且速度也很慢
          */
         for(RouteModel routeModel : myTravelsList){
-            if(null == routeModel || null ==routeModel.getSecRoutes())
+            if(null == routeModel || null ==routeModel.getSecRoutesModel())
                 continue;
-            for(SecRouteModel secRouteModel : routeModel.getSecRoutes()){
+            for(SecRouteModel secRouteModel : routeModel.getSecRoutesModel()){
                 if(null == secRouteModel)
                     break;
                 list.add(new MyTravelsUtil().builder().carStartTime(null == secRouteModel.getSettlement() ? "默认出发时间" : secRouteModel.getSettlement().getCarStartTime())

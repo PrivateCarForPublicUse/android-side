@@ -63,7 +63,7 @@ public class AdminLoginActivity extends Activity {
                     param.put("password",password.getText().toString());
                     ResponseResult responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpPost, null, Constants.SERVICE_ROOT+"authorize/login/masterName", param);
                     if(responseResult.getCode()!=200){
-                        CommonUtil.showMessage(AdminLoginActivity.this,"账号或密码错误");
+                        CommonUtil.showMessage(AdminLoginActivity.this,responseResult.getMessage());
                         return;
                     }
                     JSONObject jsonObject = new JSONObject(responseResult.getData());
