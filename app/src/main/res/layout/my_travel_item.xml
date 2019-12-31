@@ -43,20 +43,12 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/status"
             android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:text="已完成"
-            android:textSize="15dp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:gravity="center"
-            android:layout_marginTop="10dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="已报销"
             android:textSize="15dp"
             android:textStyle="bold" />
     </LinearLayout>

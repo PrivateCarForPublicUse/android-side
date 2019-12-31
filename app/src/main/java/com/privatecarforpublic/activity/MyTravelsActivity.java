@@ -110,11 +110,10 @@ public class MyTravelsActivity extends Activity {
             try{
                 Gson gson = new Gson();
                 userId = SharePreferenceUtil.getString(MyTravelsActivity.this,"userId","");
-                System.out.println(userId);
                 /*ResponseResult responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpGet, SharePreferenceUtil
                         .getString(MyTravelsActivity.this, "token", ""), Constants.SERVICE_ROOT + "/Route/userId?userId=" + userId, null);*/
-                ResponseResult responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpGet, SharePreferenceUtil
-                        .getString(MyTravelsActivity.this, "token", ""), Constants.SERVICE_ROOT + "/Route/fd", null);
+                ResponseResult responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpPost, SharePreferenceUtil
+                        .getString(MyTravelsActivity.this, "token", ""), Constants.SERVICE_ROOT + "/Route/my-toreimburse-route", null);
                 if(responseResult.getCode() != 200){
                     CommonUtil.showMessage(MyTravelsActivity.this,"无相应的出行路程！");
                     myTravelsList.clear();
@@ -146,7 +145,7 @@ public class MyTravelsActivity extends Activity {
                 list.add(new MyTravelsUtil().builder().carStartTime(null == secRouteModel.getSettlement() ? "默认出发时间" : secRouteModel.getSettlement().getCarStartTime())
                         .origin(null == secRouteModel.getSecRoute() ? "默认出发地点" :secRouteModel.getSecRoute().getOrigin())
                         .destination(null == secRouteModel.getSecRoute() ? "默认终止地点" :secRouteModel.getSecRoute().getDestination())
-                        .isReimburse(null == routeModel.getRoute() ?  0 : routeModel.getRoute().getIsReimburse())
+                        /*.isReimburse(null == routeModel.getRoute() ?  0 : routeModel.getRoute().getIsReimburse())*/
                         .status(null == routeModel.getRoute() ? 0 : routeModel.getRoute().getStatus()).build());
             }
         }

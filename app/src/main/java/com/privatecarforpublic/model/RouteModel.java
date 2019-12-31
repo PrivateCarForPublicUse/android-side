@@ -1,5 +1,6 @@
 package com.privatecarforpublic.model;
 
+import java.io.Serializable;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -15,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RouteModel {
+public class RouteModel implements Serializable {
     private User user;
     private Car car;
     private Route route;
