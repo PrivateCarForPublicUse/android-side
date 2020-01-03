@@ -119,7 +119,6 @@ public class MyTravelsActivity extends Activity {
                     myTravelsList.clear();
                 }else{
                     myTravelsList = gson.fromJson(responseResult.getData(),new TypeToken<List<RouteModel>>(){}.getType());
-                    System.out.println(myTravelsList);
                 }
             }catch (Exception e){
                 e.printStackTrace();

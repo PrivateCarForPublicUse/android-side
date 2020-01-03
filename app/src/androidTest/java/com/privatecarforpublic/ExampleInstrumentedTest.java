@@ -6,6 +6,7 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.privatecarforpublic.activity.EmployeeDetailActivity;
 import com.privatecarforpublic.model.MyTravels;
 import com.privatecarforpublic.model.RouteModel;
 import com.privatecarforpublic.response.ResponseResult;

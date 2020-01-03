@@ -38,35 +38,53 @@ public class ReimItemAdapter extends ArrayAdapter<Reimburse> {
         Reimburse reimburse = getItem(position);
 
         View view;
-        ViewHoler viewHoler;
+        ViewHolder viewHolder;
         if (convertView == null) {
             view = LayoutInflater.from(getContext()).inflate(resourceId, parent, false);
-            viewHoler = new ViewHoler();
-            viewHoler.img = view.findViewById(R.id.reim_item_headImage);
-            viewHoler.time = view.findViewById(R.id.reim_item_time);
-            viewHoler.start = view.findViewById(R.id.reim_item_start);
-            viewHoler.end = view.findViewById(R.id.reim_item_end);
-            viewHoler.status = view.findViewById(R.id.reim_item_status);
+            viewHolder = new ViewHolder();
+            viewHolder.img = view.findViewById(R.id.reim_item_headImage);
+            viewHolder.time = view.findViewById(R.id.reim_item_time);
+            viewHolder.start = view.findViewById(R.id.reim_item_start);
+            viewHolder.end = view.findViewById(R.id.reim_item_end);
+            viewHolder.isReimburse = view.findViewById(R.id.reim_item_status);
 
-            view.setTag(viewHoler);   //将viewHolder存在view中
+            view.setTag(viewHolder);   //将viewHolder存在view中
         } else {
             view = convertView;  //进行了listView的性能优化，滑动的时候感觉不会那么卡
-            viewHoler = (ViewHoler)view.getTag(); //获取
+            viewHolder = (ViewHolder) view.getTag(); //获取
         }
 
-        viewHoler.img.setImageResource(reimburse.getImgId());
-        viewHoler.time.setText(reimburse.getTime());
-        viewHoler.start.setText(reimburse.getStart());
-        viewHoler.end.setText(reimburse.getEnd());
-        viewHoler.status.setText(reimburse.getStatus());
+       /* viewHolder.img.setImageResource(reimburse.getImgId());*/
+        viewHolder.time.setText(reimburse.getApplyTime());
+        viewHolder.start.setText(reimburse.getStart());
+        viewHolder.end.setText(reimburse.getEnd());
+        String status = null;
+        switch (reimburse.getIsReimburse()) {
+            case -1:
+                status = "报销失败";
+                break;
+            case 0:
+                status = "未报销";
+                break;
+            case 1:
+                status = "已报销";
+                break;
+            case 2:
+                status = "审核中";
+                break;
+            default:
+                status = "报销状态不合理";
+                break;
+        }
+        viewHolder.isReimburse.setText(status);
         return view;
     }
 
-    class ViewHoler {
+    class ViewHolder {
         private CircleImageView img;
         private TextView time;
         private TextView start;
         private TextView end;
-        private TextView status;
+        private TextView isReimburse;
     }
 }
