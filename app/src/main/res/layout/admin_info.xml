@@ -5,7 +5,7 @@
     android:orientation="vertical">
 
     <include layout="@layout/title_bar"
-        android:id="@+id/title"/>
+        android:id="@+id/title_bar"/>
 
     <LinearLayout
         android:id="@+id/first"
@@ -14,7 +14,7 @@
         android:layout_marginLeft="40dp"
         android:layout_marginTop="70dp"
         android:layout_marginRight="60dp"
-        android:layout_below="@+id/title">
+        android:layout_below="@+id/title_bar">
 
         <TextView
             android:layout_width="70dp"

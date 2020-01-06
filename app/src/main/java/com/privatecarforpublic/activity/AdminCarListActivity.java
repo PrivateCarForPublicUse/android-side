@@ -70,14 +70,14 @@ public class AdminCarListActivity extends Activity {
                 try {
                     carList=new ArrayList<>();
                     Gson gson=new Gson();
-                    Long masterId=Long.parseLong(SharePreferenceUtil.getString(AdminCarListActivity.this, "masterId", ""));
+                    String token=SharePreferenceUtil.getString(AdminCarListActivity.this, "token", "");
                     String url;
                     if(type==0){
-                        url=Constants.SERVICE_ROOT + "car/fd?masterId="+masterId;
+                        url=Constants.SERVICE_ROOT + "car/fd";
                     }else{
-                        url=Constants.SERVICE_ROOT + "car/reviewAddCar?masterId="+masterId;
+                        url=Constants.SERVICE_ROOT + "car/reviewAddCar";
                     }
-                    ResponseResult responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpGet, "", url, null);
+                    ResponseResult responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpGet, token, url, null);
                     if (responseResult.getCode() !=200) {
                         CommonUtil.showMessage(AdminCarListActivity.this, responseResult.getMessage());
                     } else{

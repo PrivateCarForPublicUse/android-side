@@ -48,7 +48,7 @@ public class AdminAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
         Master master = getItem(position);
-        holder.admin_name.setText(master.getName());
+        holder.admin_name.setText(master.getMasterName());
 
         return convertView;
     }

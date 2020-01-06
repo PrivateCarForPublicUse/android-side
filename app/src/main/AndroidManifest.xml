@@ -62,6 +62,7 @@
         <activity android:name=".activity.AdminCarListActivity" />
         <activity android:name=".activity.ReviewCarActivity" />
         <activity android:name=".activity.AdminListActivity" />
+        <activity android:name=".activity.AddAdminActivity" />
 
         <service android:name="com.amap.api.track.AMapTrackService" />
         <service android:name="com.amap.api.location.APSService" />

@@ -49,7 +49,7 @@ public class AdminListActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.admin_car_list);
+        setContentView(R.layout.admin_list);
         ButterKnife.bind(this);
         title.setText("管理员管理");
         side.setText("添加");
@@ -65,9 +65,9 @@ public class AdminListActivity extends Activity {
                 try {
                     adminList=new ArrayList<>();
                     Gson gson=new Gson();
-                    Long masterId=Long.parseLong(SharePreferenceUtil.getString(AdminListActivity.this, "masterId", ""));
-                    String url=Constants.SERVICE_ROOT + "car/fd?masterId="+masterId;
-                    ResponseResult responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpGet, "", url, null);
+                    String token=SharePreferenceUtil.getString(AdminListActivity.this, "token", "");
+                    String url=Constants.SERVICE_ROOT + "Master/masterList";
+                    ResponseResult responseResult = JsonUtil.sendRequest(HttpRequestMethod.HttpGet, token, url, null);
                     if (responseResult.getCode() == 506) {
                         CommonUtil.showMessage(AdminListActivity.this, responseResult.getMessage());
                     } else{
@@ -91,9 +91,10 @@ public class AdminListActivity extends Activity {
         admin_list.setAdapter(adminAdapter);
     }
 
-    @OnItemClick(R.id.car_list)
+    @OnItemClick(R.id.admin_list)
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Intent intent = new Intent(AdminListActivity.this, ReviewCarActivity.class);
+        Intent intent = new Intent(AdminListActivity.this, AddAdminActivity.class);
+        intent.putExtra("type",0);
         intent.putExtra("admin", adminList.get(i));
         intent.putExtra("index",i);
         startActivityForResult(intent, TO_ALTER_ADMIN);
@@ -102,6 +103,13 @@ public class AdminListActivity extends Activity {
     @OnClick(R.id.back)
     void back() {
         finish();
+    }
+
+    @OnClick(R.id.side)
+    void add() {
+        Intent intent = new Intent(AdminListActivity.this, AddAdminActivity.class);
+        intent.putExtra("type",1);
+        startActivityForResult(intent, TO_ADD_ADMIN);
     }
 
     @Override
