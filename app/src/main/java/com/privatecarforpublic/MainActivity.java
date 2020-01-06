@@ -36,6 +36,8 @@ import com.amap.api.maps.model.Polyline;
 import com.amap.api.maps.model.PolylineOptions;
 import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.route.BusRouteResult;
+import com.amap.api.services.route.DistanceResult;
+import com.amap.api.services.route.DistanceSearch;
 import com.amap.api.services.route.DriveRouteResult;
 import com.amap.api.services.route.RideRouteResult;
 import com.amap.api.services.route.RouteSearch;
@@ -435,11 +437,21 @@ public class MainActivity extends Activity
     }
 
     private void calculate() {
-        RouteSearch routeSearch = new RouteSearch(this);
+        DistanceSearch distanceSearch = new DistanceSearch(this);
+        distanceSearch.setDistanceSearchListener(onDistanceSearchListener);
+        List<LatLonPoint> latLonPoints = new ArrayList<LatLonPoint>();
+        latLonPoints.add(startPoint);
+        DistanceSearch.DistanceQuery distanceQuery=new DistanceSearch.DistanceQuery();
+        distanceQuery.setOrigins(latLonPoints);
+        distanceQuery.setDestination(endPoint);
+        distanceQuery.setType(DistanceSearch.TYPE_DRIVING_DISTANCE);
+        distanceSearch.calculateRouteDistanceAsyn(distanceQuery);
+
+        /*RouteSearch routeSearch = new RouteSearch(this);
         routeSearch.setRouteSearchListener(onRouteSearchListener);
         RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(startPoint, endPoint);
         RouteSearch.DriveRouteQuery query = new RouteSearch.DriveRouteQuery(fromAndTo, DRIVING_SINGLE_SHORTEST, null, null, "");
-        routeSearch.calculateDriveRouteAsyn(query);
+        routeSearch.calculateDriveRouteAsyn(query);*/
     }
 
     @Override
@@ -632,6 +644,14 @@ public class MainActivity extends Activity
 
         }
     };
+
+    DistanceSearch.OnDistanceSearchListener onDistanceSearchListener=new DistanceSearch.OnDistanceSearchListener() {
+        @Override
+        public void onDistanceSearched(DistanceResult distanceResult, int i) {
+            plannedDistance = distanceResult.getDistanceResults().get(0).getDistance();
+        }
+    };
+
     RouteSearch.OnRouteSearchListener onRouteSearchListener = new RouteSearch.OnRouteSearchListener() {
         @Override
         public void onBusRouteSearched(BusRouteResult busRouteResult, int i) {
@@ -642,7 +662,7 @@ public class MainActivity extends Activity
         public void onDriveRouteSearched(DriveRouteResult driveRouteResult, int i) {
             if (i == 1000) {
                 plannedDistance = driveRouteResult.getPaths().get(0).getTollDistance();
-                Log.e(TAG,"计算规划路程出错");
+                Log.e(TAG,"计算规划路线数："+driveRouteResult.getPaths().get(0));
             } else {
                 CommonUtil.showMessage(MainActivity.this, "计算规划路程出错");
                 Log.e(TAG,"计算规划路程出错"+i);

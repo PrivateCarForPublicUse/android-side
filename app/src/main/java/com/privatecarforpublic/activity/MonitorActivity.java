@@ -2,6 +2,7 @@ package com.privatecarforpublic.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -42,6 +43,7 @@ public class MonitorActivity extends Activity {
     //位置标记
     private Marker marker;
     private User user;
+    private static boolean flag = true;
 
     @BindView(R.id.title)
     TextView title;
@@ -74,7 +76,24 @@ public class MonitorActivity extends Activity {
         user=(User)getIntent().getSerializableExtra("user");
         long terminalId=user.getTid();
         aMapTrackClient = new AMapTrackClient(getApplicationContext());
-        aMapTrackClient.queryLatestPoint(new LatestPointRequest(Long.parseLong(Constants.SERVICE_ID), terminalId), onTrackListener);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (flag){
+                    try {
+                        Thread.sleep(3000); //休眠一秒
+                        aMapTrackClient.queryLatestPoint(new LatestPointRequest(Long.parseLong(Constants.SERVICE_ID), terminalId), onTrackListener);
+                        Log.e(TAG,"重新定位");
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+    }
+
+    private void stopTimer(){
+        flag = false;
     }
 
     final OnTrackListener onTrackListener=new OnTrackListener() {
@@ -129,6 +148,7 @@ public class MonitorActivity extends Activity {
         super.onDestroy();
         //在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
         map.onDestroy();
+        stopTimer();
     }
     @Override
     protected void onResume() {
